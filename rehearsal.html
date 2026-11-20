@@ -63,7 +63,7 @@ function render() {
   selected = index;
 }
 for (const event of ["timeupdate","seeked","loadedmetadata","ended"]) audio.addEventListener(event, render);
-audio.addEventListener("loadedmetadata", () => {audio.playbackRate = Number(speed.value);});
+audio.addEventListener("loadedmetadata", () => {audio.playbackRate = Number(speed.value); statusText.textContent = document.querySelector("#upload").files[0]?.name || "";});
 audio.addEventListener("error", () => {statusText.textContent = "O navegador não conseguiu abrir o áudio. Experimente outro arquivo.";});
 speed.onchange = () => {audio.playbackRate = Number(speed.value);};
 document.querySelector("#upload").onchange = event => {
