@@ -16,10 +16,17 @@ def timestamp(seconds):
     return f"{hours:02}:{minutes:02}:{ms // 1000:02}.{ms % 1000:03}"
 
 
-def webvtt(lines):
-    cues = ["WEBVTT\n"]
+def subtitles(lines, subrip=False):
+    cues = [] if subrip else ["WEBVTT\n"]
     for index, (at, text) in enumerate(lines):
         if text:
             end = lines[index + 1][0] if index + 1 < len(lines) else at + 3
-            cues.append(f"{timestamp(at)} --> {timestamp(end)}\n{escape(text, quote=False)}\n")
+            times = f"{timestamp(at)} --> {timestamp(end)}"
+            if subrip:
+                times = f"{len(cues) + 1}\n" + times.replace(".", ",")
+            cues.append(f"{times}\n{escape(text, quote=False)}\n")
     return "\n".join(cues)
+
+
+def webvtt(lines):
+    return subtitles(lines)

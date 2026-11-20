@@ -58,8 +58,9 @@ def main():
     output = parser.add_mutually_exclusive_group()
     output.add_argument("--html", type=Path, help="Create a local rehearsal page")
     output.add_argument("--vtt", type=Path, help="Export WebVTT subtitles")
+    output.add_argument("--srt", type=Path, help="Export numbered SubRip subtitles")
     args = parser.parse_args()
-    target = args.html or args.vtt
+    target = args.html or args.vtt or args.srt
     if target and (args.client_id or args.start):
         parser.error("Export and playback options must be used separately")
     if args.start < 0:
@@ -70,8 +71,11 @@ def main():
         if not lines:
             parser.error("No [mm:ss.xx] timestamps in this file")
         if target:
-            from exports import rehearsal, webvtt
-            content = rehearsal(lines, args.file.stem) if args.html else webvtt(lines)
+            from exports import rehearsal, subtitles
+            if args.html:
+                content = rehearsal(lines, args.file.stem)
+            else:
+                content = subtitles(lines, subrip=bool(args.srt))
             with target.open("x", encoding="utf-8", newline="\n") as stream:
                 stream.write(content)
             return

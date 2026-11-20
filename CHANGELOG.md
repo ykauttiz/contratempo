@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-20 · Legendas SubRip
+
+Use `python lyrics.py demo.lrc --srt ensaio.srt` para gerar legendas numeradas em UTF-8. A conversão respeita as pausas da letra. Se o arquivo de destino já existir, o comando encerra sem sobrescrevê-lo.
+
 ## 2026-11-20 · Contratempo
 
 - Sala de ensaio offline com reprodução de áudio local, seleção de verso e velocidade ajustável.
