@@ -1,6 +1,6 @@
 # Changelog
 
-## 2026-11-20 · Contracanto
+## 2026-11-20 · Contratempo
 
 - Sala de ensaio offline com reprodução de áudio local, seleção de verso e velocidade ajustável.
 - Exportação WebVTT e demo de 12 segundos com acompanhamento instrumental original.

@@ -1,10 +1,10 @@
-# Contracanto
+# Contratempo
 
-![Contracanto · sala de ensaio](cover.svg)
+![Contratempo · sala de ensaio](cover.svg)
 
-Abra uma gravação, volte ao verso que escapou e ensaie de novo mais devagar. O **Contracanto** usa as marcações de tempo de um arquivo LRC para acompanhar uma música. No navegador, a própria gravação marca o tempo.
+Abra uma gravação, volte ao verso que escapou e ensaie de novo mais devagar. O **Contratempo** usa as marcações de tempo de um arquivo LRC para acompanhar uma música. No navegador, a própria gravação marca o tempo.
 
-**[Tocar a demo de 12 segundos](https://ykauttiz.github.io/discord-lyrics-sync/)** · Letra e acompanhamento instrumental originais. Aperte play, escolha um verso ou reduza a velocidade para 0,75×.
+**[Tocar a demo de 12 segundos](https://ykauttiz.github.io/contratempo/)** · Letra e acompanhamento instrumental originais. Aperte play, escolha um verso ou reduza a velocidade para 0,75×.
 
 ## Ensaiar com a sua música
 
@@ -45,8 +45,16 @@ O aplicativo usa Rich Presence local. O terminal acompanha cada linha e a presen
 
 ## English quick start
 
-Open the [live rehearsal demo](https://ykauttiz.github.io/discord-lyrics-sync/), or export your own offline rehearsal page with `python lyrics.py song.lrc --html practice.html`. Choose your audio file, slow it down, and select a line to seek. Export subtitles with `--vtt subtitles.vtt`. Run `python lyrics.py demo.lrc` for an offline, timed lyric preview. Start your audio separately. Use your own UTF-8 LRC file or add `--start SECONDS` to seek. Optional Discord desktop sharing uses an application ID. Personal account tokens are never required.
+Open the [live rehearsal demo](https://ykauttiz.github.io/contratempo/), or export your own offline rehearsal page with `python lyrics.py song.lrc --html practice.html`. Choose your audio file, slow it down, and select a line to seek. Export subtitles with `--vtt subtitles.vtt`. Run `python lyrics.py demo.lrc` for an offline, timed lyric preview. Start your audio separately. Use your own UTF-8 LRC file or add `--start SECONDS` to seek. Optional Discord desktop sharing uses an application ID. Personal account tokens are never required.
 
 ## Desenvolvimento
 
 `python -m unittest -v` verifica timestamps repetidos, offset, linhas simultâneas, silêncio, retomada e intervalo de publicação. [Histórico](CHANGELOG.md) · [MIT](LICENSE)
+
+## Como o código segue a música
+
+Em um arquivo LRC, uma linha como `[00:03.00]A chuva ficou pra trás` diz que o verso começa no terceiro segundo. Em `lyrics.py`, a função `timeline` lê essas marcas, aplica o deslocamento global do arquivo e agrupa versos simultâneos. O modo terminal usa um relógio monotônico; o modo navegador consulta a posição do áudio.
+
+Em `exports.py`, a mesma linha do tempo gera tanto a folha de ensaio quanto as legendas. A folha exportada contém a letra e o player; a gravação é escolhida no dispositivo. No modelo `rehearsal.html`, uma busca binária identifica o último verso iniciado sempre que o áudio muda de posição. A demo publicada em `docs/` inclui uma gravação curta para experimentar sem preparar arquivos.
+
+Para reproduzir a verificação, execute `python -m unittest -v` na raiz. Uma das verificações compara a página publicada ao resultado de gerar a demo novamente. Para relatar um problema, inclua um trecho LRC fictício, o segundo em que ocorreu e o comportamento esperado.

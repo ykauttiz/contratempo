@@ -83,7 +83,7 @@ def main():
     except KeyboardInterrupt:
         pass
     except Exception as exc:
-        parser.exit(1, f"Lyrics Sync: {exc}\n")
+        parser.exit(1, f"Contratempo: {exc}\n")
     finally:
         if client:
             try:
