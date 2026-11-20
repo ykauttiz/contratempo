@@ -14,13 +14,14 @@ audio{width:100%;margin:.5rem 0 1rem}select,input,button{font:inherit;max-width:
 ol{padding-left:0;list-style:none}li button{padding:.65rem .25rem;width:100%;text-align:left;color:inherit;background:transparent;border:0;border-bottom:1px solid #42606a;cursor:pointer}
 li button[aria-current=true]{color:#ffbc86}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #ffbc86}
 time{font: .86rem monospace;color:#afc4c6;margin-right:1rem}
+[hidden]{display:none!important}.tools label{min-width:0;max-width:100%}button,select{min-height:44px}
 </style>
 <header><b>CONTRATEMPO</b><a href="https://github.com/ykauttiz/contratempo">Código no GitHub ↗</a></header>
 <main><h1 id="title"></h1>
 <div class="stage"><small>Verso atual</small><p id="current"></p><p id="next"></p></div>
 <audio id="audio" controls preload="metadata"></audio>
 <div class="tools"><label>Usar áudio local<input id="upload" type="file" accept="audio/*"></label>
-<label>Velocidade<select id="speed"><option>0.75</option><option selected>1</option><option>1.25</option><option>1.5</option></select></label></div>
+<label>Velocidade<select id="speed"><option>0.75</option><option selected>1</option><option>1.25</option><option>1.5</option></select></label><label id="pitch-control" hidden><span>Tom do áudio</span><select id="pitch"><option value="preserve">Manter original</option><option value="vary">Variar com a velocidade</option></select></label></div>
 <p id="status" role="status"></p><h2>Versos</h2><ol id="lines"></ol></main>
 <footer><small>O arquivo de áudio escolhido fica no navegador.</small></footer>
 <script id="score" type="application/json">__SCORE__</script>
@@ -65,6 +66,11 @@ function render() {
 for (const event of ["timeupdate","seeked","loadedmetadata","ended"]) audio.addEventListener(event, render);
 audio.addEventListener("loadedmetadata", () => {audio.playbackRate = Number(speed.value); statusText.textContent = document.querySelector("#upload").files[0]?.name || "";});
 audio.addEventListener("error", () => {statusText.textContent = "O navegador não conseguiu abrir o áudio. Experimente outro arquivo.";});
+const pitch = document.querySelector("#pitch");
+if ("preservesPitch" in audio) {
+  document.querySelector("#pitch-control").hidden = false;
+  pitch.onchange = () => { audio.preservesPitch = pitch.value === "preserve"; };
+}
 speed.onchange = () => {audio.playbackRate = Number(speed.value);};
 document.querySelector("#upload").onchange = event => {
   const file = event.target.files[0];

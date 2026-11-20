@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-20 · Tom do áudio
+
+Ao mudar a velocidade, escolha se quer manter o tom original da gravação ou acompanhar a mudança de velocidade. O controle aparece em navegadores que oferecem esse recurso.
+
 ## 2026-11-20 · Legendas SubRip
 
 Use `python lyrics.py demo.lrc --srt ensaio.srt` para gerar legendas numeradas em UTF-8. A conversão respeita as pausas da letra. Se o arquivo de destino já existir, o comando encerra sem sobrescrevê-lo.
