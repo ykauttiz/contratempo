@@ -1,16 +1,36 @@
-# Lyrics Sync ♪
+# Contracanto
 
-![Lyrics Sync](cover.svg)
+![Contracanto · sala de ensaio](cover.svg)
 
-Um player de letras para quem ensaia, compõe ou quer compartilhar o verso atual no Discord. Abra um arquivo LRC e acompanhe cada linha pelo relógio do player.
+Abra uma gravação, volte ao verso que escapou e ensaie de novo mais devagar. O **Contracanto** usa as marcações de tempo de um arquivo LRC para acompanhar uma música. No navegador, a própria gravação marca o tempo.
 
-**Experimente em 12 segundos** · Requer Python 3.10+. Baixe os arquivos da mesma branch e abra o terminal na pasta.
+**[Tocar a demo de 12 segundos](https://ykauttiz.github.io/discord-lyrics-sync/)** · Letra e acompanhamento instrumental originais. Aperte play, escolha um verso ou reduza a velocidade para 0,75×.
+
+## Ensaiar com a sua música
+
+Baixe o repositório, abra o terminal na pasta e use Python 3.10 ou superior. No Windows, você também pode usar `py` no lugar de `python`.
+
+```sh
+python lyrics.py minha-letra.lrc --html ensaio.html
+```
+
+Abra **ensaio.html** e selecione a gravação em **Usar áudio local**. Pause, arraste a posição ou clique em um verso para voltar a ele. A página funciona offline e lê o áudio no próprio dispositivo. A precisão depende dos timestamps da sua letra.
+
+## Usar a letra em vídeo
+
+```sh
+python lyrics.py minha-letra.lrc --vtt legendas.vtt
+```
+
+Cada legenda vai até a próxima marcação. Uma linha vazia indica silêncio. Se o último verso não tiver marca de fim, ele recebe três segundos. Os comandos de exportação criam arquivos novos e preservam os existentes.
+
+## Acompanhar no terminal
 
 ```sh
 python lyrics.py demo.lrc
 ```
 
-No Windows, você também pode usar `py` no lugar de `python`. A demo contém uma letra original e roda offline. Para acompanhar uma gravação, inicie o áudio junto com o comando. Para retomar a partir de 45 segundos, use `python lyrics.py sua-letra.lrc --start 45`.
+O modo terminal tem relógio próprio. Inicie a gravação separadamente ou use `--start 45` para começar no segundo 45.
 
 ## Compartilhar no Discord
 
@@ -25,7 +45,7 @@ O aplicativo usa Rich Presence local. O terminal acompanha cada linha e a presen
 
 ## English quick start
 
-Run `python lyrics.py demo.lrc` for an offline, timed lyric preview. Start your audio separately. Use your own UTF-8 LRC file or add `--start SECONDS` to seek. Optional Discord desktop sharing uses an application ID. Personal account tokens are never required.
+Open the [live rehearsal demo](https://ykauttiz.github.io/discord-lyrics-sync/), or export your own offline rehearsal page with `python lyrics.py song.lrc --html practice.html`. Choose your audio file, slow it down, and select a line to seek. Export subtitles with `--vtt subtitles.vtt`. Run `python lyrics.py demo.lrc` for an offline, timed lyric preview. Start your audio separately. Use your own UTF-8 LRC file or add `--start SECONDS` to seek. Optional Discord desktop sharing uses an application ID. Personal account tokens are never required.
 
 ## Desenvolvimento
 

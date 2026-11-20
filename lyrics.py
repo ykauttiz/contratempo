@@ -55,7 +55,13 @@ def main():
     parser.add_argument("file", type=Path)
     parser.add_argument("--client-id", help="Discord application ID for optional desktop presence")
     parser.add_argument("--start", type=int, default=0, help="Start at this many seconds")
+    output = parser.add_mutually_exclusive_group()
+    output.add_argument("--html", type=Path, help="Create a local rehearsal page")
+    output.add_argument("--vtt", type=Path, help="Export WebVTT subtitles")
     args = parser.parse_args()
+    target = args.html or args.vtt
+    if target and (args.client_id or args.start):
+        parser.error("Export and playback options must be used separately")
     if args.start < 0:
         parser.error("--start must be at least zero")
     client = None
@@ -63,6 +69,12 @@ def main():
         lines = timeline(args.file.read_text(encoding="utf-8-sig"))
         if not lines:
             parser.error("No [mm:ss.xx] timestamps in this file")
+        if target:
+            from exports import rehearsal, webvtt
+            content = rehearsal(lines, args.file.stem) if args.html else webvtt(lines)
+            with target.open("x", encoding="utf-8", newline="\n") as stream:
+                stream.write(content)
+            return
         if args.client_id:
             from pypresence import Presence
             client = Presence(args.client_id)

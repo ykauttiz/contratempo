@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-11-20 · Contracanto
+
+- Sala de ensaio offline com reprodução de áudio local, seleção de verso e velocidade ajustável.
+- Exportação WebVTT e demo de 12 segundos com acompanhamento instrumental original.
+- O comando de terminal e a integração opcional com Discord continuam disponíveis.
+
 ## 2026-11-20 · Primeiro player executável
 
 - Player Python para arquivos LRC, letra de demonstração e opção de retomada.
