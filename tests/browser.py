@@ -14,11 +14,12 @@ with sync_playwright() as engine, TemporaryDirectory() as folder:
     binary = shutil.which(command) if command else None
     if command and not binary:
         raise RuntimeError(f"Browser unavailable: {command}")
-    browser = engine.chromium.launch(executable_path=binary)
+    backend = engine.firefox if os.environ.get("CONTRATEMPO_ENGINE") == "firefox" else engine.chromium
+    browser = backend.launch(executable_path=binary)
     server = ThreadingHTTPServer(("127.0.0.1", 0), partial(SimpleHTTPRequestHandler, directory=root / "docs"))
     Thread(target=server.serve_forever, daemon=True).start()
     for width in (375, 1280):
-        page = browser.new_page(viewport={"width": width, "height": 840})
+        page = browser.new_page(viewport={"width": width, "height": 840}, reduced_motion="reduce")
         errors = []
         page.on("pageerror", lambda error: errors.append(str(error)))
         page.goto(f"http://127.0.0.1:{server.server_port}/")
@@ -31,6 +32,14 @@ with sync_playwright() as engine, TemporaryDirectory() as folder:
         page.locator("#lines button").nth(2).click()
         page.locator("#mark-b").click()
         expect(page.locator("#range")).to_contain_text("00:03.000 até 00:06.000")
+        page.locator("audio").evaluate("el => {el.currentTime = 5.9; return el.play()}")
+        page.wait_for_function("!audio.paused && audio.currentTime >= 3 && audio.currentTime < 4")
+        page.locator("audio").evaluate("el => el.pause()")
+        page.locator("#clear").click()
+        page.locator("#lines button").nth(1).focus()
+        page.keyboard.press("ArrowDown")
+        page.keyboard.press("Enter")
+        expect(page.locator("#current")).to_have_text("Na curva da madrugada")
         page.locator("#speed").select_option(".75")
         assert page.locator("audio").evaluate("el => el.playbackRate") == .75
         page.locator("#present").click()
@@ -38,6 +47,9 @@ with sync_playwright() as engine, TemporaryDirectory() as folder:
         expect(page.locator(".queue")).to_be_visible()
         page.locator("#lrc").set_input_files({"name": "Letra.lrc", "mimeType": "text/plain",
                                              "buffer": "[00:01]Olá & <você>\n[00:03]Fim".encode()})
+        expect(page.locator("h1")).to_have_text("Letra")
+        page.locator("#lrc").set_input_files({"name": "invalido.lrc", "mimeType": "text/plain", "buffer": b"bad"})
+        expect(page.locator("#status")).to_contain_text("Nenhum verso")
         expect(page.locator("h1")).to_have_text("Letra")
         page.get_by_text("Editar letra e sincronização", exact=True).click()
         page.locator("#offset").fill("500")
