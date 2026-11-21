@@ -135,7 +135,22 @@ function build() {
   $("offset").value = "0";
   render();
 }
+let laps = 0;
+function resetTraining() { laps = 0; $("training-count").textContent = ""; }
+$("training").onchange = resetTraining;
+function repeatPassage() {
+  audio.currentTime = pointA;
+  const every = Number($("training").value);
+  if (!every) return;
+  laps++;
+  const speed = $("speed");
+  if (laps % every === 0 && speed.selectedIndex < speed.options.length-1) {
+    speed.selectedIndex++; audio.playbackRate = Number(speed.value);
+  }
+  $("training-count").textContent = "Volta " + laps + " · " + speed.selectedOptions[0].textContent;
+}
 function updateLoop() {
+  resetTraining();
   $("clear").disabled = pointA === null;
   $("range").textContent = pointA === null ? "Marque o início e depois o fim durante o ensaio." :
     pointB === null ? "Início em " + stamp(pointA, true) + ". Escolha o fim." :
@@ -163,7 +178,7 @@ function clearLoop() { pointA = pointB = null; updateLoop(); }
 $("clear").onclick = () => { clearLoop(); tell("Repetição desligada."); };
 function tick() {
   if (!$("wave-box").hidden && audio.duration > 0) $("wave-seek").value = Math.round(audio.currentTime / audio.duration * 1000);
-  if (pointB !== null && !audio.paused && audio.currentTime >= pointB) audio.currentTime = pointA;
+  if (pointB !== null && !audio.paused && audio.currentTime >= pointB) repeatPassage();
   render();
 }
 let frame = 0, pendingSession = null;
@@ -171,7 +186,7 @@ function animate() { tick(); if (!audio.paused) frame = requestAnimationFrame(an
 audio.onplay = () => { document.body.classList.add("playing"); cancelAnimationFrame(frame); animate(); };
 audio.onpause = () => { document.body.classList.remove("playing"); cancelAnimationFrame(frame); };
 audio.onended = () => {
-  if (pointB !== null) { audio.currentTime = pointA; audio.play().catch(() => tell("Pressione play para continuar.")); }
+  if (pointB !== null) { repeatPassage(); audio.play().catch(() => tell("Pressione play para continuar.")); }
 };
 audio.ontimeupdate = tick;
 audio.onseeked = render;

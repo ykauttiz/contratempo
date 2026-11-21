@@ -46,6 +46,11 @@ input,button,select,textarea { background:#20221e }
 .queue-tools {justify-content:space-between;border-top:1px solid var(--edge);padding-top:.7rem}
 .queue-tools span {font-variant-numeric:tabular-nums}
 .present .transport {align-self:center}
+
+@media (prefers-reduced-motion:no-preference){
+  .queue button[aria-current=true] {animation: reveal-state 220ms ease-out both}
+  @keyframes reveal-state {from{opacity:.7;transform:translateY(3px)}to{opacity:1;transform:none}}
+}
 </style>
 </head>
 <body>
@@ -64,7 +69,7 @@ input,button,select,textarea { background:#20221e }
 <label class="font-size" hidden id="font-control">Tamanho da letra<input id="font" type="range" min="70" max="160" value="100"></label>
 <div class="settings"><label>Velocidade<select id="speed"><option value=".5">0,5×</option><option value=".75">0,75×</option><option selected value="1">1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option></select></label>
 <label id="pitch-control" hidden>Tom do áudio<select id="pitch"><option value="preserve">Manter original</option><option value="vary">Variar com a velocidade</option></select></label></div>
-<fieldset><legend>Repetir um trecho</legend><div class="actions"><button id="verse-loop">Repetir verso atual</button><button id="mark-a">Marcar A</button><button id="mark-b">Marcar B</button><button id="clear" disabled>Limpar</button></div><small id="range">Marque o início e depois o fim durante o ensaio.</small></fieldset>
+<fieldset><legend>Repetir um trecho</legend><div class="actions"><label>Treino de velocidade<select id="training"><option value="0">Desligado</option><option value="2">Aumentar a cada 2 voltas</option><option value="4">Aumentar a cada 4 voltas</option></select></label><output id="training-count"></output><button id="verse-loop">Repetir verso atual</button><button id="mark-a">Marcar A</button><button id="mark-b">Marcar B</button><button id="clear" disabled>Limpar</button></div><small id="range">Marque o início e depois o fim durante o ensaio.</small></fieldset>
 </section>
 <section class="queue" id="fila"><h2>Versos</h2><label>Buscar na letra<input id="verse-search" type="search" placeholder="Palavra ou trecho" aria-controls="lines"></label><p id="verse-count" role="status"></p><ol id="lines" aria-label="Ir para um verso"></ol><nav class="queue-tools" id="queue-pages" aria-label="Páginas da letra" hidden><button id="queue-back">Anterior</button><span id="queue-page"></span><button id="queue-forward">Próxima</button></nav></section>
 </div>
@@ -214,7 +219,22 @@ function build() {
   $("offset").value = "0";
   render();
 }
+let laps = 0;
+function resetTraining() { laps = 0; $("training-count").textContent = ""; }
+$("training").onchange = resetTraining;
+function repeatPassage() {
+  audio.currentTime = pointA;
+  const every = Number($("training").value);
+  if (!every) return;
+  laps++;
+  const speed = $("speed");
+  if (laps % every === 0 && speed.selectedIndex < speed.options.length-1) {
+    speed.selectedIndex++; audio.playbackRate = Number(speed.value);
+  }
+  $("training-count").textContent = "Volta " + laps + " · " + speed.selectedOptions[0].textContent;
+}
 function updateLoop() {
+  resetTraining();
   $("clear").disabled = pointA === null;
   $("range").textContent = pointA === null ? "Marque o início e depois o fim durante o ensaio." :
     pointB === null ? "Início em " + stamp(pointA, true) + ". Escolha o fim." :
@@ -242,7 +262,7 @@ function clearLoop() { pointA = pointB = null; updateLoop(); }
 $("clear").onclick = () => { clearLoop(); tell("Repetição desligada."); };
 function tick() {
   if (!$("wave-box").hidden && audio.duration > 0) $("wave-seek").value = Math.round(audio.currentTime / audio.duration * 1000);
-  if (pointB !== null && !audio.paused && audio.currentTime >= pointB) audio.currentTime = pointA;
+  if (pointB !== null && !audio.paused && audio.currentTime >= pointB) repeatPassage();
   render();
 }
 let frame = 0, pendingSession = null;
@@ -250,7 +270,7 @@ function animate() { tick(); if (!audio.paused) frame = requestAnimationFrame(an
 audio.onplay = () => { document.body.classList.add("playing"); cancelAnimationFrame(frame); animate(); };
 audio.onpause = () => { document.body.classList.remove("playing"); cancelAnimationFrame(frame); };
 audio.onended = () => {
-  if (pointB !== null) { audio.currentTime = pointA; audio.play().catch(() => tell("Pressione play para continuar.")); }
+  if (pointB !== null) { repeatPassage(); audio.play().catch(() => tell("Pressione play para continuar.")); }
 };
 audio.ontimeupdate = tick;
 audio.onseeked = render;

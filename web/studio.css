@@ -40,3 +40,8 @@ input,button,select,textarea { background:#20221e }
 .queue-tools {justify-content:space-between;border-top:1px solid var(--edge);padding-top:.7rem}
 .queue-tools span {font-variant-numeric:tabular-nums}
 .present .transport {align-self:center}
+
+@media (prefers-reduced-motion:no-preference){
+  .queue button[aria-current=true] {animation: reveal-state 220ms ease-out both}
+  @keyframes reveal-state {from{opacity:.7;transform:translateY(3px)}to{opacity:1;transform:none}}
+}

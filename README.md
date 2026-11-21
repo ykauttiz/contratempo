@@ -96,3 +96,5 @@ Use **Verso anterior**, **Reiniciar verso** e **Próximo verso** na mesa de repr
 Guarde ensaios com nomes diferentes na biblioteca local. Cada entrada recupera letra, posição e ajustes. Selecione a gravação novamente ao abrir. Use a exportação JSON para manter uma cópia fora do navegador.
 
 [Ver testes e capturas de celular e computador](https://github.com/ykauttiz/contratempo/actions/workflows/contratempo-tests.yml). Na execução, abra o artefato **capturas-chromium** ou **capturas-firefox**. As imagens usam dados fictícios.
+
+Treino progressivo no loop A/B: escolha duas ou quatro voltas para avançar ao próximo nível de velocidade. O contador acompanha o trecho durante a reprodução.
