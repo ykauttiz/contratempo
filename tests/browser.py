@@ -91,6 +91,12 @@ with sync_playwright() as engine, TemporaryDirectory() as folder:
         page.locator("#present").click()
         page.keyboard.press("Escape")
         expect(page.locator(".queue")).to_be_visible()
+        page.locator("#lrc").set_input_files({"name": "Palavras.lrc", "mimeType": "text/plain",
+                                             "buffer": "[00:01]<00:01.00>olá <00:01.40>mundo\n[00:03]Fim".encode()})
+        expect(page.locator("h1")).to_have_text("Palavras")
+        expect(page.locator("#status")).to_contain_text("Marcas de palavra removidas")
+        expect(page.locator(".queue")).to_contain_text("olá mundo")
+        expect(page.locator(".queue")).not_to_contain_text("<00:01")
         page.locator("#lrc").set_input_files({"name": "Letra.lrc", "mimeType": "text/plain",
                                              "buffer": "[00:01]Olá & <você>\n[00:03]Fim".encode()})
         expect(page.locator("h1")).to_have_text("Letra")
