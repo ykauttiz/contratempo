@@ -73,7 +73,7 @@ input,button,select,textarea { background:#20221e }
 <details><summary>Editar letra e sincronização</summary><p>Use uma marca por verso, como [00:03.500]. Uma linha só com a marca indica pausa.</p><div class="settings"><label>Verso para sincronizar<select id="cue"></select></label><button id="tap">Marcar no tempo atual</button></div><label>Letra LRC<textarea id="editor" rows="8" spellcheck="false"></textarea></label>
 <label>Ajuste adicional (ms)<input id="offset" type="number" step="1" value="0"></label><small>Um valor positivo adianta a letra. O ajuste entra no arquivo ao aplicar.</small>
 <div class="actions"><button id="apply">Aplicar edição</button><button id="undo" disabled>Desfazer</button><button id="redo" disabled>Refazer</button></div><div class="settings"><label>Formato<select id="format"><option>LRC</option><option>SRT</option><option>WebVTT</option></select></label><button id="save">Baixar arquivo aplicado</button></div></details>
-<details><summary>Guardar ou retomar sessão</summary><p>Guarde a letra aplicada, a posição, a velocidade e o trecho A/B. Ao retomar, selecione a mesma gravação.</p><div class="actions"><button id="keep">Guardar neste navegador</button><button id="resume" disabled>Retomar última sessão</button><button id="backup">Baixar sessão JSON</button></div><label>Abrir sessão JSON<input id="session-file" type="file" accept=".json,application/json"></label></details></section>
+<details><summary>Guardar ou retomar sessão</summary><p>Guarde a letra aplicada, a posição, a velocidade e o trecho A/B. Ao retomar, selecione a mesma gravação.</p><div class="actions"><button id="keep">Guardar neste navegador</button><button id="resume" disabled>Retomar última sessão</button><label>Nome do ensaio<input id="saved-name" maxlength="80"></label><button id="library-add">Adicionar à biblioteca</button><label>Ensaios guardados<select id="library-select"></select></label><button id="library-open">Abrir ensaio escolhido</button><button id="backup">Baixar sessão JSON</button></div><label>Abrir sessão JSON<input id="session-file" type="file" accept=".json,application/json"></label></details></section>
 <p id="status" role="status"></p></main>
 <footer>Contratempo <span>Ensaio com letras sincronizadas</span></footer>
 <script id="score" type="application/json">{"lines": [[0.0, "O farol riscou a rua"], [3.0, "A chuva ficou pra trás"], [6.0, "Na curva da madrugada"], [9.0, "Teu áudio tocou mais uma vez"], [12.0, ""]], "title": "Depois da chuva", "audio": "ensaio.mp3"}</script>
@@ -398,6 +398,31 @@ $("keep").onclick = () => {
 };
 $("resume").onclick = () => {
   try { openSession(localStorage.getItem(sessionKey)); } catch { tell("Não foi possível abrir a sessão guardada."); }
+};
+const libraryKey = "contratempo.library.v1";
+function readLibrary() {
+  const entries = JSON.parse(localStorage.getItem(libraryKey) || "[]");
+  if (!Array.isArray(entries) || entries.some(e => typeof e?.name !== "string" || typeof e?.session !== "string")) throw Error("Biblioteca inválida.");
+  return entries;
+}
+function libraryOptions(entries) {
+  $("library-select").replaceChildren(...entries.map((e,i) => new Option(e.name,String(i))));
+  $("library-open").disabled = !entries.length;
+}
+try {libraryOptions(readLibrary());} catch {libraryOptions([]);}
+$("library-add").onclick = () => {
+  try {
+    const name = $("saved-name").value.trim(), entries = readLibrary();
+    if (!name) return tell("Dê um nome ao ensaio.");
+    if (entries.some(e => e.name.toLocaleLowerCase("pt-BR") === name.toLocaleLowerCase("pt-BR"))) return tell("Já existe um ensaio com esse nome.");
+    entries.push({name,session:encodeSession()});
+    localStorage.setItem(libraryKey,JSON.stringify(entries));libraryOptions(entries);
+    $("library-select").value = String(entries.length-1);tell("Ensaio adicionado à biblioteca.");
+  } catch {tell("Não foi possível guardar o ensaio. Exporte a sessão em JSON.");}
+};
+$("library-open").onclick = () => {
+  try {openSession(readLibrary()[Number($("library-select").value)].session);}
+  catch {tell("Não foi possível abrir esse ensaio.");}
 };
 $("backup").onclick = () => {
   const url = URL.createObjectURL(new Blob([encodeSession()], {type:"application/json"}));

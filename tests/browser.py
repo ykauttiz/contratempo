@@ -29,6 +29,11 @@ with sync_playwright() as engine, TemporaryDirectory() as folder:
         assert page.evaluate("location.hash === document.querySelector('.skip').hash")
         assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
         page.wait_for_function("audio.readyState >= 1")
+        if os.environ.get("CAPTURAR_DEMO") == "1":
+            captures = root / "capturas"
+            captures.mkdir(exist_ok=True)
+            page.screenshot(path=captures / f"demo-{width}.png", animations="disabled")
+
         # Exercise the local recording flow. The standard-library HTTP fixture
         # does not support byte-range requests for seeking in a remote MP3.
         page.locator("#upload").set_input_files(root / "docs/ensaio.mp3")
@@ -95,6 +100,11 @@ with sync_playwright() as engine, TemporaryDirectory() as folder:
         page.locator("#lrc").set_input_files(path)
         expect(page.locator("#lines time").first).to_have_text("00:00.500")
         page.get_by_text("Guardar ou retomar sessão", exact=True).click()
+        page.locator("#saved-name").fill("Ensaio principal")
+        page.locator("#library-add").click()
+        expect(page.locator("#library-select option")).to_have_count(1)
+        page.locator("#library-add").click()
+        expect(page.locator("#status")).to_contain_text("Já existe")
         page.locator("#keep").click()
         page.reload()
         page.get_by_text("Guardar ou retomar sessão", exact=True).click()

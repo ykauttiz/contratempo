@@ -92,3 +92,7 @@ Selecione um verso e clique em **Repetir verso atual**. O player usa a marca do 
 Busque palavras na fila de versos, inclusive sem acentos. As setas, Home e End percorrem os resultados visíveis enquanto o ensaio continua.
 
 Use **Verso anterior**, **Reiniciar verso** e **Próximo verso** na mesa de reprodução. A busca cobre até 10 mil marcações e a fila exibe 60 por página. Home e End percorrem o conjunto filtrado inteiro. A lista completa de marcas para edição só é montada ao abrir o editor.
+
+Guarde ensaios com nomes diferentes na biblioteca local. Cada entrada recupera letra, posição e ajustes. Selecione a gravação novamente ao abrir. Use a exportação JSON para manter uma cópia fora do navegador.
+
+[Ver testes e capturas de celular e computador](https://github.com/ykauttiz/contratempo/actions/workflows/contratempo-tests.yml). Na execução, abra o artefato **capturas-chromium** ou **capturas-firefox**. As imagens usam dados fictícios.

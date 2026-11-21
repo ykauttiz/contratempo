@@ -31,3 +31,9 @@ jobs:
         env:
           CONTRATEMPO_ENGINE: ${{ matrix.browser }}
           CONTRATEMPO_BROWSER: ${{ matrix.browser == 'chromium' && 'google-chrome' || '' }}
+          CAPTURAR_DEMO: "1"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: capturas-${{ matrix.browser }}
+          path: capturas/*.png
+          if-no-files-found: error

@@ -320,6 +320,31 @@ $("keep").onclick = () => {
 $("resume").onclick = () => {
   try { openSession(localStorage.getItem(sessionKey)); } catch { tell("Não foi possível abrir a sessão guardada."); }
 };
+const libraryKey = "contratempo.library.v1";
+function readLibrary() {
+  const entries = JSON.parse(localStorage.getItem(libraryKey) || "[]");
+  if (!Array.isArray(entries) || entries.some(e => typeof e?.name !== "string" || typeof e?.session !== "string")) throw Error("Biblioteca inválida.");
+  return entries;
+}
+function libraryOptions(entries) {
+  $("library-select").replaceChildren(...entries.map((e,i) => new Option(e.name,String(i))));
+  $("library-open").disabled = !entries.length;
+}
+try {libraryOptions(readLibrary());} catch {libraryOptions([]);}
+$("library-add").onclick = () => {
+  try {
+    const name = $("saved-name").value.trim(), entries = readLibrary();
+    if (!name) return tell("Dê um nome ao ensaio.");
+    if (entries.some(e => e.name.toLocaleLowerCase("pt-BR") === name.toLocaleLowerCase("pt-BR"))) return tell("Já existe um ensaio com esse nome.");
+    entries.push({name,session:encodeSession()});
+    localStorage.setItem(libraryKey,JSON.stringify(entries));libraryOptions(entries);
+    $("library-select").value = String(entries.length-1);tell("Ensaio adicionado à biblioteca.");
+  } catch {tell("Não foi possível guardar o ensaio. Exporte a sessão em JSON.");}
+};
+$("library-open").onclick = () => {
+  try {openSession(readLibrary()[Number($("library-select").value)].session);}
+  catch {tell("Não foi possível abrir esse ensaio.");}
+};
 $("backup").onclick = () => {
   const url = URL.createObjectURL(new Blob([encodeSession()], {type:"application/json"}));
   const link = document.createElement("a"); link.href = url; link.download = score.title + ".json"; link.click();
