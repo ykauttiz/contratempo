@@ -101,6 +101,7 @@ $("mark-b").onclick = () => {
 function clearLoop() { pointA = pointB = null; updateLoop(); }
 $("clear").onclick = () => { clearLoop(); tell("Repetição desligada."); };
 function tick() {
+  if (!$("wave-box").hidden && audio.duration > 0) $("wave-seek").value = Math.round(audio.currentTime / audio.duration * 1000);
   if (pointB !== null && !audio.paused && audio.currentTime >= pointB) audio.currentTime = pointA;
   render();
 }
@@ -122,6 +123,7 @@ function loadAudio(file) {
   if (!file) return;
   if (!pendingSession) clearLoop();
   if (localUrl) URL.revokeObjectURL(localUrl);
+  activeAudioFile = file; resetWave();
   localUrl = URL.createObjectURL(file); audio.src = localUrl;
   tell("Gravação selecionada · " + file.name);
 };
@@ -181,6 +183,7 @@ $("tap").onclick = () => {
 };
 function togglePresentation() {
   const enabled = document.body.classList.toggle("present");
+  $("font-control").hidden = !enabled;
   $("present").textContent = enabled ? "Voltar ao ensaio" : "Apresentar";
   $("present").setAttribute("aria-pressed", String(enabled));
   $("present").focus();
@@ -237,6 +240,7 @@ function openSession(raw) {
     throw Error("Sessão inválida ou versão incompatível.");
   const lines = parseLrc(data.lyrics, 0);
   ++importId; past.length = future.length = 0; historyButtons();
+  activeAudioFile = null; resetWave();
   audio.pause(); audio.removeAttribute("src"); audio.load();
   if (localUrl) { URL.revokeObjectURL(localUrl); localUrl = null; }
   $("upload").value = "";
@@ -268,3 +272,40 @@ $("session-file").onchange = async event => {
     openSession(raw);
   } catch { tell("Use uma sessão JSON válida do Contratempo de até 4 MB."); }
 };
+
+$("font").oninput = () => document.body.style.setProperty("--lyric-scale", Number($("font").value) / 100);
+let waveVersion = 0, activeAudioFile = null;
+function resetWave() {
+  waveVersion++;
+  $("wave-box").hidden = true; $("wave-load").disabled = false; $("wave-status").textContent = "";
+}
+$("wave-load").onclick = async () => {
+  const id = ++waveVersion, file = activeAudioFile;
+  if (!audio.readyState || !Number.isFinite(audio.duration)) return tell("Carregue uma gravação primeiro.");
+  if (audio.duration > 300 || (file && file.size > 16 * 1024 * 1024)) return tell("A prévia da onda aceita até 5 minutos e 16 MB. O player continua disponível.");
+  $("wave-load").disabled = true; $("wave-status").textContent = "Calculando a forma de onda…";
+  let context;
+  try {
+    const buffer = file ? await file.arrayBuffer() : await (await fetch(score.audio)).arrayBuffer();
+    if (id !== waveVersion) return;
+    context = new AudioContext({sampleRate:16000});
+    const decoded = await context.decodeAudioData(buffer);
+    if (id !== waveVersion) return;
+    const samples = decoded.getChannelData(0), canvas = $("wave"), pen = canvas.getContext("2d");
+    pen.clearRect(0, 0, canvas.width, canvas.height);
+    pen.strokeStyle = "#ffa58c"; pen.lineWidth = 2; pen.beginPath();
+    const bars = 320, center = canvas.height / 2;
+    for (let i = 0; i < bars; i++) {
+      const start = Math.floor(i * samples.length / bars), end = Math.floor((i + 1) * samples.length / bars);
+      let peak = 0;
+      for (let j = start; j < end; j++) peak = Math.max(peak, Math.abs(samples[j]));
+      const x = (i + 0.5) * canvas.width / bars, height = Math.max(1, peak * center);
+      pen.moveTo(x, center - height); pen.lineTo(x, center + height);
+    }
+    pen.stroke(); $("wave-box").hidden = false; tick();
+    $("wave-status").textContent = "Toque na onda ou use as setas para buscar.";
+  } catch {
+    if (id === waveVersion) { $("wave-load").disabled = false; $("wave-status").textContent = "Forma de onda indisponível para esta gravação."; }
+  } finally { if (context) await context.close(); }
+};
+$("wave-seek").oninput = () => { if (audio.duration > 0) audio.currentTime = Number($("wave-seek").value) * audio.duration / 1000; };

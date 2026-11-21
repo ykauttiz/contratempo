@@ -1,5 +1,22 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="960" height="228" viewBox="0 0 960 228" role="img" aria-label="Contratempo">
- <rect width="960" height="228" rx="12" fill="#101822"/>
- <g font-family="system-ui,sans-serif"><text x="45" y="56" letter-spacing="4" fill="#ffad69" font-size="19">SALA DE ENSAIO</text>
- <text x="40" y="155" font-size="75" font-weight="700" fill="#fff2d9">Contratempo</text>
- <text x="790" y="162" font-size="120" fill="#ffad69">♪</text></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="280" viewBox="0 0 1100 280" role="img" aria-labelledby="title desc">
+  <title id="title">Contratempo</title>
+  <desc id="desc">Capa coral da sala de ensaio com um disco de vinil à direita.</desc>
+  <defs>
+    <clipPath id="sleeve"><rect width="1100" height="280" rx="16"/></clipPath>
+  </defs>
+  <g clip-path="url(#sleeve)">
+    <rect width="1100" height="280" fill="#f4ae99"/>
+    <g transform="translate(985 140)" fill="none" stroke="#634852">
+      <circle r="230" fill="#302128" stroke="none"/>
+      <circle r="218"/><circle r="208"/><circle r="198"/><circle r="188"/><circle r="178"/>
+      <circle r="168"/><circle r="158"/><circle r="148"/><circle r="138"/><circle r="128"/>
+      <circle r="118"/><circle r="108"/><circle r="98"/><circle r="88"/>
+      <circle r="76" fill="#e89e88"/><circle r="49"/><circle r="8" fill="#302128"/>
+    </g>
+    <g fill="#301d26">
+      <text x="54" y="66" font-family="monospace" font-size="17" letter-spacing="3">SALA DE ENSAIO</text>
+      <text x="48" y="176" font-family="Georgia,serif" font-size="99" letter-spacing="-6">Contratempo</text>
+      <text x="54" y="231" font-family="system-ui,sans-serif" font-size="22">Letras sincronizadas · áudio local · legendas</text>
+    </g>
+  </g>
+</svg>

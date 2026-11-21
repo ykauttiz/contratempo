@@ -14,6 +14,8 @@ Abra uma gravação, volte ao verso que escapou e ensaie de novo mais devagar. O
 4. Abra **Editar letra e sincronização**. Selecione um verso e marque seu início enquanto ouve. Para corrigir a letra inteira, edite os tempos ou informe um ajuste em milissegundos e clique em **Aplicar edição**. Por exemplo, +250 adianta cada marca em um quarto de segundo. Você pode desfazer e refazer as últimas 20 edições.
 5. Escolha LRC para retomar a edição, SRT para um editor de vídeo ou WebVTT para um player web. Baixe o arquivo antes de fechar a página. O navegador exporta a versão aplicada.
 
+Use **Ver forma de onda** para buscar visualmente em gravações de até cinco minutos e 16 MB. A prévia usa o primeiro canal do áudio; arquivos maiores continuam disponíveis no player. Em apresentação, ajuste o tamanho da letra com o controle deslizante.
+
 Em **Guardar ou retomar sessão**, salve no navegador ou baixe o JSON para levar a outro aparelho. A sessão inclui letra, tempos, loop e velocidade. Escolha a mesma gravação ao reabrir.
 
 O leitor aceita `[mm:ss]`, frações de um a três dígitos, várias marcas no início da mesma linha, pausas e `[offset:250]`. Tempos fora de ordem são ordenados; versos simultâneos são agrupados. O limite do importador web é de 1 MiB e 10 mil marcações. A reprodução depende dos codecs disponíveis no navegador.

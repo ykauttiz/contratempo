@@ -15,6 +15,8 @@ header,footer,.actions,.settings{display:flex;align-items:center;gap:.75rem;flex
 .mode{float:right;font-size:.83rem}.monitor .label{padding-top:.75rem}.monitor #current{clear:both;padding-top:.4rem}.present :is(header,.sleeve,.queue,.workspace,footer,fieldset,.monitor .settings){display:none}.present .desk{display:block}.present .monitor{min-height:95vh;display:flex;flex-direction:column;justify-content:center}.present .mode{align-self:flex-end}.present #current{font-size:clamp(3rem,8vw,8rem)}#cue{max-width:min(100%,32rem)}
 
 .workspace.drag{outline:3px dashed var(--coral)}
+
+.wave-tools{margin:0 0 1rem}.wave-tools button{font-size:.85rem}.wave-tools small:empty{display:none}#wave-box{position:relative;background:#21171d;border-radius:.4rem;margin:.5rem 0}#wave{width:100%;height:54px;display:block}#wave-seek{position:absolute;inset:0;width:100%;height:100%;appearance:none;background:transparent;border:0;padding:0;margin:0;cursor:pointer}#wave-seek::-webkit-slider-thumb{appearance:none;background:#fff2ec;width:3px;height:52px}#wave-seek::-moz-range-thumb{background:#fff2ec;width:3px;height:52px;border:0}.present .wave-tools{display:none}.present #current{font-size:calc(clamp(3rem,8vw,8rem) * var(--lyric-scale,1))}.font-size{align-self:flex-start}
 </style>
 </head>
 <body>
@@ -27,6 +29,8 @@ header,footer,.actions,.settings{display:flex;align-items:center;gap:.75rem;flex
 <div class="desk">
 <section class="monitor" aria-labelledby="now"><button id="present" class="mode">Apresentar</button><h2 class="label" id="now">Verso atual</h2><p id="current"></p><p id="next"></p>
 <audio id="audio" controls preload="metadata" aria-label="Reprodutor do ensaio"></audio>
+<div class="wave-tools"><button id="wave-load">Ver forma de onda</button><small id="wave-status"></small><div id="wave-box" hidden><canvas id="wave" width="960" height="88" aria-hidden="true"></canvas><input type="range" min="0" max="1000" value="0" id="wave-seek" aria-label="Posição na forma de onda"></div></div>
+<label class="font-size" hidden id="font-control">Tamanho da letra<input id="font" type="range" min="70" max="160" value="100"></label>
 <div class="settings"><label>Velocidade<select id="speed"><option value=".5">0,5×</option><option value=".75">0,75×</option><option selected value="1">1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option></select></label>
 <label id="pitch-control" hidden>Tom do áudio<select id="pitch"><option value="preserve">Manter original</option><option value="vary">Variar com a velocidade</option></select></label></div>
 <fieldset><legend>Repetir um trecho</legend><div class="actions"><button id="mark-a">Marcar A</button><button id="mark-b">Marcar B</button><button id="clear" disabled>Limpar</button></div><small id="range">Marque o início e depois o fim durante o ensaio.</small></fieldset>
@@ -145,6 +149,7 @@ $("mark-b").onclick = () => {
 function clearLoop() { pointA = pointB = null; updateLoop(); }
 $("clear").onclick = () => { clearLoop(); tell("Repetição desligada."); };
 function tick() {
+  if (!$("wave-box").hidden && audio.duration > 0) $("wave-seek").value = Math.round(audio.currentTime / audio.duration * 1000);
   if (pointB !== null && !audio.paused && audio.currentTime >= pointB) audio.currentTime = pointA;
   render();
 }
@@ -166,6 +171,7 @@ function loadAudio(file) {
   if (!file) return;
   if (!pendingSession) clearLoop();
   if (localUrl) URL.revokeObjectURL(localUrl);
+  activeAudioFile = file; resetWave();
   localUrl = URL.createObjectURL(file); audio.src = localUrl;
   tell("Gravação selecionada · " + file.name);
 };
@@ -225,6 +231,7 @@ $("tap").onclick = () => {
 };
 function togglePresentation() {
   const enabled = document.body.classList.toggle("present");
+  $("font-control").hidden = !enabled;
   $("present").textContent = enabled ? "Voltar ao ensaio" : "Apresentar";
   $("present").setAttribute("aria-pressed", String(enabled));
   $("present").focus();
@@ -281,6 +288,7 @@ function openSession(raw) {
     throw Error("Sessão inválida ou versão incompatível.");
   const lines = parseLrc(data.lyrics, 0);
   ++importId; past.length = future.length = 0; historyButtons();
+  activeAudioFile = null; resetWave();
   audio.pause(); audio.removeAttribute("src"); audio.load();
   if (localUrl) { URL.revokeObjectURL(localUrl); localUrl = null; }
   $("upload").value = "";
@@ -312,4 +320,41 @@ $("session-file").onchange = async event => {
     openSession(raw);
   } catch { tell("Use uma sessão JSON válida do Contratempo de até 4 MB."); }
 };
+
+$("font").oninput = () => document.body.style.setProperty("--lyric-scale", Number($("font").value) / 100);
+let waveVersion = 0, activeAudioFile = null;
+function resetWave() {
+  waveVersion++;
+  $("wave-box").hidden = true; $("wave-load").disabled = false; $("wave-status").textContent = "";
+}
+$("wave-load").onclick = async () => {
+  const id = ++waveVersion, file = activeAudioFile;
+  if (!audio.readyState || !Number.isFinite(audio.duration)) return tell("Carregue uma gravação primeiro.");
+  if (audio.duration > 300 || (file && file.size > 16 * 1024 * 1024)) return tell("A prévia da onda aceita até 5 minutos e 16 MB. O player continua disponível.");
+  $("wave-load").disabled = true; $("wave-status").textContent = "Calculando a forma de onda…";
+  let context;
+  try {
+    const buffer = file ? await file.arrayBuffer() : await (await fetch(score.audio)).arrayBuffer();
+    if (id !== waveVersion) return;
+    context = new AudioContext({sampleRate:16000});
+    const decoded = await context.decodeAudioData(buffer);
+    if (id !== waveVersion) return;
+    const samples = decoded.getChannelData(0), canvas = $("wave"), pen = canvas.getContext("2d");
+    pen.clearRect(0, 0, canvas.width, canvas.height);
+    pen.strokeStyle = "#ffa58c"; pen.lineWidth = 2; pen.beginPath();
+    const bars = 320, center = canvas.height / 2;
+    for (let i = 0; i < bars; i++) {
+      const start = Math.floor(i * samples.length / bars), end = Math.floor((i + 1) * samples.length / bars);
+      let peak = 0;
+      for (let j = start; j < end; j++) peak = Math.max(peak, Math.abs(samples[j]));
+      const x = (i + 0.5) * canvas.width / bars, height = Math.max(1, peak * center);
+      pen.moveTo(x, center - height); pen.lineTo(x, center + height);
+    }
+    pen.stroke(); $("wave-box").hidden = false; tick();
+    $("wave-status").textContent = "Toque na onda ou use as setas para buscar.";
+  } catch {
+    if (id === waveVersion) { $("wave-load").disabled = false; $("wave-status").textContent = "Forma de onda indisponível para esta gravação."; }
+  } finally { if (context) await context.close(); }
+};
+$("wave-seek").oninput = () => { if (audio.duration > 0) audio.currentTime = Number($("wave-seek").value) * audio.duration / 1000; };
 </script></body></html>

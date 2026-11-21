@@ -2,6 +2,9 @@
 import os
 import shutil
 from pathlib import Path
+from functools import partial
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+from threading import Thread
 from tempfile import TemporaryDirectory
 from playwright.sync_api import sync_playwright, expect
 
@@ -12,14 +15,18 @@ with sync_playwright() as engine, TemporaryDirectory() as folder:
     if command and not binary:
         raise RuntimeError(f"Browser unavailable: {command}")
     browser = engine.chromium.launch(executable_path=binary)
+    server = ThreadingHTTPServer(("127.0.0.1", 0), partial(SimpleHTTPRequestHandler, directory=root / "docs"))
+    Thread(target=server.serve_forever, daemon=True).start()
     for width in (375, 1280):
         page = browser.new_page(viewport={"width": width, "height": 840})
         errors = []
         page.on("pageerror", lambda error: errors.append(str(error)))
-        page.goto((root / "docs/index.html").as_uri())
+        page.goto(f"http://127.0.0.1:{server.server_port}/")
         page.wait_for_function("audio.readyState >= 1")
         assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
         page.locator("#lines button").nth(1).click()
+        page.locator("#wave-load").click()
+        expect(page.locator("#wave-box")).to_be_visible()
         page.locator("#mark-a").click()
         page.locator("#lines button").nth(2).click()
         page.locator("#mark-b").click()
@@ -56,4 +63,6 @@ with sync_playwright() as engine, TemporaryDirectory() as folder:
         expect(page.locator("#lines time").first).to_have_text("00:00.500")
         assert not errors, errors
         page.close()
+    server.shutdown()
+    server.server_close()
     browser.close()
