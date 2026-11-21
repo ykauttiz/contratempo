@@ -1,11 +1,17 @@
 """Run the published demo through Chromium, including a touch-sized viewport."""
+import os
+import shutil
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from playwright.sync_api import sync_playwright, expect
 
 root = Path(__file__).resolve().parents[1]
 with sync_playwright() as engine, TemporaryDirectory() as folder:
-    browser = engine.chromium.launch()
+    command = os.environ.get("CONTRATEMPO_BROWSER")
+    binary = shutil.which(command) if command else None
+    if command and not binary:
+        raise RuntimeError(f"Browser unavailable: {command}")
+    browser = engine.chromium.launch(executable_path=binary)
     for width in (375, 1280):
         page = browser.new_page(viewport={"width": width, "height": 840})
         errors = []
