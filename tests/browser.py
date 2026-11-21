@@ -123,6 +123,21 @@ with sync_playwright() as engine, TemporaryDirectory() as folder:
         expect(page.locator("#lines button").last).to_be_focused()
         expect(page.locator("#lines button").last).to_contain_text("Linha 9999")
         expect(page.locator("#lines button")).to_have_count(40)
+        page.goto(f"http://127.0.0.1:{server.server_port}/portfolio/")
+        page.keyboard.press("Tab")
+        expect(page.locator(".skip")).to_be_focused()
+        page.keyboard.press("Enter")
+        assert page.evaluate("location.hash === '#projetos'")
+        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+        projects = page.locator(".project")
+        expect(projects).to_have_count(4)
+        for project in projects.all():
+            project.locator("summary").press("Enter")
+            expect(project.locator("details p")).to_be_visible()
+            preview = project.locator("img")
+            assert page.request.get(preview.evaluate("image => image.src")).ok
+        if os.environ.get("CAPTURAR_DEMO") == "1":
+            page.screenshot(path=captures / f"portfolio-{width}.png", full_page=True, animations="disabled")
         assert not errors, errors
         page.close()
     server.shutdown()

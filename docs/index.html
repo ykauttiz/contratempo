@@ -57,6 +57,21 @@ input,button,select,textarea { background:#20221e }
   .monitor,.queue,fieldset,input,select,audio {min-inline-size:0}
   input[type=file] {inline-size:100%}
 }
+
+
+:root { --focus-ring:#ffc265 }
+.sleeve { background:radial-gradient(ellipse at 80% 105%,#e9a548,transparent 70%), #f4cb81 }
+.studio-nav a { border-bottom:2px solid transparent }
+.studio-nav a:hover { border-bottom-color:#ffc265 }
+.monitor, .queue { box-shadow: 0 12px 26px #0002 }
+
+:is(a,button,summary,input,select,textarea):focus-visible { outline:3px solid var(--focus-ring); outline-offset:3px }
+section[id], h2[id] { scroll-margin-top:1rem }
+@media (prefers-reduced-motion:no-preference) {
+  html { scroll-behavior:smooth }
+  details[open] > summary ~ p { animation:details-open .2s ease-out both }
+  @keyframes details-open { from { opacity:.7; transform:translateY(3px) } to { opacity:1; transform:none } }
+}
 </style>
 </head>
 <body>
@@ -66,7 +81,7 @@ input,button,select,textarea { background:#20221e }
 <section class="sleeve" aria-labelledby="title">
 <div class="jacket"><p class="label">Sala de ensaio</p><h1 id="title"></h1><p id="track-info"></p></div><div class="disc" aria-hidden="true"><i></i></div>
 </section>
-<nav class="studio-nav" aria-label="Áreas do ensaio"><a href="#mesa">Reprodução</a><a href="#fila">Versos</a><a href="#arquivos">Áudio e letra</a></nav>
+<nav class="studio-nav" aria-label="Áreas do ensaio"><a href="#mesa">Reprodução</a><a href="#fila">Versos</a><a href="#arquivos">Áudio e letra</a><a href="https://ykauttiz.github.io/contratempo/portfolio/">Portfólio ↗</a></nav>
 <div class="desk" id="mesa">
 <section class="monitor" aria-labelledby="now"><button id="present" class="mode">Apresentar</button><h2 class="label" id="now">Verso atual</h2><p id="current"></p><p id="next"></p>
 <audio id="audio" controls preload="metadata" aria-label="Reprodutor do ensaio"></audio>

@@ -2,6 +2,8 @@
 
 ## 2026-11-21
 
+Navegação visual revista, foco de teclado explícito, link para o portfólio e roteiro curto no README.
+
 Os testes de interface também exercitam telas de 320 pixels.
 
 O backup e a biblioteca recuperam o treino de velocidade escolhido. Sessões anteriores abrem com o treino desligado.

@@ -51,3 +51,18 @@ input,button,select,textarea { background:#20221e }
   .monitor,.queue,fieldset,input,select,audio {min-inline-size:0}
   input[type=file] {inline-size:100%}
 }
+
+
+:root { --focus-ring:#ffc265 }
+.sleeve { background:radial-gradient(ellipse at 80% 105%,#e9a548,transparent 70%), #f4cb81 }
+.studio-nav a { border-bottom:2px solid transparent }
+.studio-nav a:hover { border-bottom-color:#ffc265 }
+.monitor, .queue { box-shadow: 0 12px 26px #0002 }
+
+:is(a,button,summary,input,select,textarea):focus-visible { outline:3px solid var(--focus-ring); outline-offset:3px }
+section[id], h2[id] { scroll-margin-top:1rem }
+@media (prefers-reduced-motion:no-preference) {
+  html { scroll-behavior:smooth }
+  details[open] > summary ~ p { animation:details-open .2s ease-out both }
+  @keyframes details-open { from { opacity:.7; transform:translateY(3px) } to { opacity:1; transform:none } }
+}

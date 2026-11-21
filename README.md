@@ -1,5 +1,9 @@
 # Contratempo
 
+**Experimente em um minuto.** Na faixa de exemplo, escolha o verso de 0:03. Use **Repetir verso atual** e selecione o treino que aumenta a velocidade a cada duas voltas.
+
+[Abrir demonstração](https://ykauttiz.github.io/contratempo/) · [Portfólio do Kauê](https://ykauttiz.github.io/contratempo/portfolio/)
+
 ![Contratempo · sala de ensaio](cover.svg)
 
 Abra uma gravação, volte ao verso que escapou e ensaie de novo mais devagar. O **Contratempo** usa as marcações de tempo de um arquivo LRC para acompanhar uma música. No navegador, a própria gravação marca o tempo.
