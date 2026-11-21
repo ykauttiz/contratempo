@@ -32,7 +32,7 @@ with sync_playwright() as engine, TemporaryDirectory() as folder:
         page.locator("#lrc").set_input_files({"name": "Letra.lrc", "mimeType": "text/plain",
                                              "buffer": "[00:01]Olá & <você>\n[00:03]Fim".encode()})
         expect(page.locator("h1")).to_have_text("Letra")
-        page.locator("summary").click()
+        page.get_by_text("Editar letra e sincronização", exact=True).click()
         page.locator("#offset").fill("500")
         page.locator("#apply").click()
         expect(page.locator("#editor")).to_have_value("[00:00.500]Olá & <você>\n[00:02.500]Fim\n")
@@ -46,6 +46,13 @@ with sync_playwright() as engine, TemporaryDirectory() as folder:
             download.value.save_as(path)
             assert expected in path.read_text(encoding="utf-8")
         page.locator("#lrc").set_input_files(path)
+        expect(page.locator("#lines time").first).to_have_text("00:00.500")
+        page.get_by_text("Guardar ou retomar sessão", exact=True).click()
+        page.locator("#keep").click()
+        page.reload()
+        page.get_by_text("Guardar ou retomar sessão", exact=True).click()
+        page.locator("#resume").click()
+        expect(page.locator("h1")).to_have_text("Letra")
         expect(page.locator("#lines time").first).to_have_text("00:00.500")
         assert not errors, errors
         page.close()

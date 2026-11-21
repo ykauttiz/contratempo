@@ -104,7 +104,7 @@ function tick() {
   if (pointB !== null && !audio.paused && audio.currentTime >= pointB) audio.currentTime = pointA;
   render();
 }
-let frame = 0;
+let frame = 0, pendingSession = null;
 function animate() { tick(); if (!audio.paused) frame = requestAnimationFrame(animate); }
 audio.onplay = () => { document.body.classList.add("playing"); cancelAnimationFrame(frame); animate(); };
 audio.onpause = () => { document.body.classList.remove("playing"); cancelAnimationFrame(frame); };
@@ -113,14 +113,14 @@ audio.onended = () => {
 };
 audio.ontimeupdate = tick;
 audio.onseeked = render;
-audio.onloadedmetadata = () => { audio.playbackRate = Number($("speed").value); render(); };
+audio.onloadedmetadata = () => { if (pendingSession) restoreTransport(); audio.playbackRate = Number($("speed").value); render(); };
 audio.onerror = () => tell("Não foi possível abrir o áudio. Tente outro arquivo.");
 $("pitch-control").hidden = !("preservesPitch" in audio);
 $("pitch").onchange = () => { audio.preservesPitch = $("pitch").value === "preserve"; };
 $("speed").onchange = () => { audio.playbackRate = Number($("speed").value); };
 function loadAudio(file) {
   if (!file) return;
-  clearLoop();
+  if (!pendingSession) clearLoop();
   if (localUrl) URL.revokeObjectURL(localUrl);
   localUrl = URL.createObjectURL(file); audio.src = localUrl;
   tell("Gravação selecionada · " + file.name);
@@ -134,7 +134,7 @@ async function loadLyrics(file) {
     const source = new TextDecoder("utf-8", {fatal:true}).decode(await file.arrayBuffer());
     if (id !== importId) return;
     const lines = parseLrc(source, 0);
-    past.length = future.length = 0; historyButtons();
+    pendingSession = null; past.length = future.length = 0; historyButtons();
     score.lines = lines; score.title = source.match(/^\[ti:([^\]\r\n]+)\]/im)?.[1] || file.name.replace(/\.lrc$/i, "");
     build(); clearLoop(); tell("Letra carregada · " + file.name);
   } catch (err) { if (id === importId) tell(err instanceof TypeError ? "Salve a letra em UTF-8 e tente novamente." : err.message); }
@@ -213,3 +213,58 @@ $("save").onclick = () => {
 if (score.audio) audio.src = score.audio;
 else tell("Escolha a gravação correspondente a esta letra.");
 build();
+
+const sessionKey = "contratempo.session.v1";
+function encodeSession() {
+  return JSON.stringify({version:1, title:score.title, lyrics:serialize(), position:pendingSession?.position ?? audio.currentTime,
+    speed:$("speed").value, pitch:$("pitch").value, a:pointA, b:pointB}, null, 2);
+}
+function restoreTransport() {
+  const saved = pendingSession;
+  if (!saved) return;
+  audio.currentTime = Math.min(audio.duration, saved.position);
+  if (pointA !== null && pointA >= audio.duration) clearLoop();
+  if (pointB !== null && pointB > audio.duration) { pointB = null; updateLoop(); }
+  pendingSession = null;
+}
+function openSession(raw) {
+  const data = JSON.parse(raw);
+  const validTime = value => Number.isFinite(value) && value >= 0;
+  if (data?.version !== 1 || typeof data.title !== "string" || typeof data.lyrics !== "string" ||
+      !validTime(data.position) || !Array.from($("speed").options).some(o => o.value === data.speed) ||
+      !["preserve","vary"].includes(data.pitch) || !(data.a === null || validTime(data.a)) ||
+      !(data.b === null || (validTime(data.b) && data.a !== null && data.b - data.a >= 0.25)))
+    throw Error("Sessão inválida ou versão incompatível.");
+  const lines = parseLrc(data.lyrics, 0);
+  ++importId; past.length = future.length = 0; historyButtons();
+  audio.pause(); audio.removeAttribute("src"); audio.load();
+  if (localUrl) { URL.revokeObjectURL(localUrl); localUrl = null; }
+  $("upload").value = "";
+  score.title = data.title; score.lines = lines;
+  pendingSession = data; pointA = data.a; pointB = data.b;
+  $("speed").value = data.speed; $("pitch").value = data.pitch;
+  if ("preservesPitch" in audio) audio.preservesPitch = data.pitch === "preserve";
+  build(); updateLoop(); tell("Sessão aberta. Selecione a gravação para retomar.");
+}
+try { $("resume").disabled = !localStorage.getItem(sessionKey); } catch { /* Standalone files may disable storage. */ }
+$("keep").onclick = () => {
+  try { localStorage.setItem(sessionKey, encodeSession()); $("resume").disabled = false; tell("Sessão guardada neste navegador."); }
+  catch { tell("Armazenamento indisponível. Baixe a sessão em JSON."); }
+};
+$("resume").onclick = () => {
+  try { openSession(localStorage.getItem(sessionKey)); } catch { tell("Não foi possível abrir a sessão guardada."); }
+};
+$("backup").onclick = () => {
+  const url = URL.createObjectURL(new Blob([encodeSession()], {type:"application/json"}));
+  const link = document.createElement("a"); link.href = url; link.download = score.title + ".json"; link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+};
+$("session-file").onchange = async event => {
+  const file = event.target.files[0]; if (!file) return;
+  const id = ++importId;
+  try {
+    if (file.size > 4 * 1024 * 1024) throw Error();
+    const raw = await file.text(); if (id !== importId) return;
+    openSession(raw);
+  } catch { tell("Use uma sessão JSON válida do Contratempo de até 4 MB."); }
+};

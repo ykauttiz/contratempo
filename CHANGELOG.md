@@ -2,6 +2,7 @@
 
 ## 2026-11-20 · Estúdio de ensaio
 
+- Sessão portátil em JSON e retomada local de letra, posição, velocidade e loop.
 - Importação local de áudio e LRC por seletor ou arraste.
 - Edição com marcação durante a reprodução, ajuste em milissegundos e histórico de 20 edições.
 - Repetição A/B, modo apresentação, navegação entre versos pelo teclado e layout para celular.
