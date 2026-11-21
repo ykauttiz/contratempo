@@ -174,6 +174,7 @@ $("undo").onclick = () => restore(past, future);
 $("redo").onclick = () => restore(future, past);
 $("tap").onclick = () => {
   if (!audio.readyState) return tell("Carregue um áudio primeiro.");
+  if ($("editor").value !== serialize() || Number($("offset").value) !== 0) return tell("Aplique as mudanças da letra antes de marcar o tempo.");
   const index = Number($("cue").value), at = Math.round(audio.currentTime * 1000) / 1000;
   if ((index > 0 && at <= score.lines[index - 1][0]) ||
       (index + 1 < score.lines.length && at >= score.lines[index + 1][0])) return tell("Marque o tempo entre o verso anterior e o seguinte.");

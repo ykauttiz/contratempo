@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-21
+
+A marcação pelo relógio do áudio agora preserva edições de letra e offset ainda não aplicadas.
+
 ## 2026-11-20 · Estúdio de ensaio
 
 - Forma de onda interativa para gravações curtas e tamanho de letra ajustável na apresentação.
