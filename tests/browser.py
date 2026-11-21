@@ -23,6 +23,11 @@ with sync_playwright() as engine, TemporaryDirectory() as folder:
         errors = []
         page.on("pageerror", lambda error: errors.append(str(error)))
         page.goto(f"http://127.0.0.1:{server.server_port}/")
+        page.keyboard.press("Tab")
+        expect(page.locator(".skip")).to_be_focused()
+        page.keyboard.press("Enter")
+        assert page.evaluate("location.hash === document.querySelector('.skip').hash")
+        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
         page.wait_for_function("audio.readyState >= 1")
         # Exercise the local recording flow. The standard-library HTTP fixture
         # does not support byte-range requests for seeking in a remote MP3.

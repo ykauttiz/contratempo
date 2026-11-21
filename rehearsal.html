@@ -13,7 +13,8 @@
 <section class="sleeve" aria-labelledby="title">
 <div class="jacket"><p class="label">Sala de ensaio</p><h1 id="title"></h1><p id="track-info"></p></div><div class="disc" aria-hidden="true"><i></i></div>
 </section>
-<div class="desk">
+<nav class="studio-nav" aria-label="Áreas do ensaio"><a href="#mesa">Reprodução</a><a href="#fila">Versos</a><a href="#arquivos">Áudio e letra</a></nav>
+<div class="desk" id="mesa">
 <section class="monitor" aria-labelledby="now"><button id="present" class="mode">Apresentar</button><h2 class="label" id="now">Verso atual</h2><p id="current"></p><p id="next"></p>
 <audio id="audio" controls preload="metadata" aria-label="Reprodutor do ensaio"></audio>
 <div class="wave-tools"><button id="wave-load">Ver forma de onda</button><small id="wave-status"></small><div id="wave-box" hidden><canvas id="wave" width="960" height="88" aria-hidden="true"></canvas><input type="range" min="0" max="1000" value="0" id="wave-seek" aria-label="Posição na forma de onda"></div></div>
@@ -22,9 +23,9 @@
 <label id="pitch-control" hidden>Tom do áudio<select id="pitch"><option value="preserve">Manter original</option><option value="vary">Variar com a velocidade</option></select></label></div>
 <fieldset><legend>Repetir um trecho</legend><div class="actions"><button id="verse-loop">Repetir verso atual</button><button id="mark-a">Marcar A</button><button id="mark-b">Marcar B</button><button id="clear" disabled>Limpar</button></div><small id="range">Marque o início e depois o fim durante o ensaio.</small></fieldset>
 </section>
-<section class="queue"><h2>Versos</h2><ol id="lines" aria-label="Ir para um verso"></ol></section>
+<section class="queue" id="fila"><h2>Versos</h2><ol id="lines" aria-label="Ir para um verso"></ol></section>
 </div>
-<section class="workspace"><h2>Seu ensaio</h2><p>Selecione ou arraste a gravação e a letra LRC para cá. Os arquivos ficam neste navegador.</p>
+<section class="workspace" id="arquivos"><h2>Seu ensaio</h2><p>Selecione ou arraste a gravação e a letra LRC para cá. Os arquivos ficam neste navegador.</p>
 <div class="settings"><label>Usar áudio local<input id="upload" type="file" accept="audio/*"></label><label>Importar letra LRC<input id="lrc" type="file" accept=".lrc,text/plain"></label></div>
 <details><summary>Editar letra e sincronização</summary><p>Use uma marca por verso, como [00:03.500]. Uma linha só com a marca indica pausa.</p><div class="settings"><label>Verso para sincronizar<select id="cue"></select></label><button id="tap">Marcar no tempo atual</button></div><label>Letra LRC<textarea id="editor" rows="8" spellcheck="false"></textarea></label>
 <label>Ajuste adicional (ms)<input id="offset" type="number" step="1" value="0"></label><small>Um valor positivo adianta a letra. O ajuste entra no arquivo ao aplicar.</small>
