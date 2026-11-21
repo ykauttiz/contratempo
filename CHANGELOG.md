@@ -2,6 +2,8 @@
 
 ## 2026-11-21
 
+Marcas de palavra do LRC estendido, como `<00:12.50>`, deixam de aparecer na letra, na fila de versos e nas legendas SRT e WebVTT. O navegador avisa ao importar uma letra que as continha. A sincronização palavra a palavra continua fora do escopo.
+
 Os testes de interface também exercitam telas de 320 pixels.
 
 O backup e a biblioteca recuperam o treino de velocidade escolhido. Sessões anteriores abrem com o treino desligado.

@@ -73,6 +73,8 @@ Open the [live rehearsal demo](https://ykauttiz.github.io/contratempo/), or expo
 
 Em um arquivo LRC, uma linha como `[00:03.00]A chuva ficou pra trás` diz que o verso começa no terceiro segundo. Em `lrc.py`, a função `timeline` lê essas marcas, aplica o deslocamento global do arquivo e agrupa versos simultâneos. O modo terminal usa um relógio monotônico; o modo navegador consulta a posição do áudio.
 
+O Contratempo trabalha com tempo **por verso**. No LRC estendido, as marcas de palavra, como `<00:12.50>`, são removidas da letra (no navegador e no Python) e só o tempo da linha vale; a sincronização palavra a palavra não é suportada e, ao salvar de novo, essas marcas não são preservadas. Texto comum entre `< >`, como `<3`, continua na letra.
+
 Em `exports.py`, a mesma linha do tempo gera tanto a folha de ensaio quanto as legendas. A folha exportada contém a letra e o player; a gravação é escolhida no dispositivo. Em `web/player.js`, uma busca binária identifica o último verso iniciado sempre que o áudio muda de posição. A demo publicada em `docs/` inclui uma gravação curta para experimentar sem preparar arquivos.
 
 Para reproduzir a verificação, execute `python -m unittest -v` na raiz. Uma das verificações compara a página publicada ao resultado de gerar a demo novamente. Para relatar um problema, inclua um trecho LRC fictício, o segundo em que ocorreu e o comportamento esperado.
