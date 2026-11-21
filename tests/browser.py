@@ -111,6 +111,7 @@ with sync_playwright() as engine, TemporaryDirectory() as folder:
         page.reload()
         page.get_by_text("Guardar ou retomar sessão", exact=True).click()
         page.locator("#resume").click()
+        expect(page.locator("#training")).to_have_value("2")
         expect(page.locator("h1")).to_have_text("Letra")
         expect(page.locator("#lines time").first).to_have_text("00:00.500")
         page.locator("#lrc").set_input_files({"name":"Longa.lrc","mimeType":"text/plain",

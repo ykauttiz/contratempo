@@ -297,7 +297,7 @@ build();
 const sessionKey = "contratempo.session.v1";
 function encodeSession() {
   return JSON.stringify({version:1, title:score.title, lyrics:serialize(), position:pendingSession?.position ?? audio.currentTime,
-    speed:$("speed").value, pitch:$("pitch").value, a:pointA, b:pointB}, null, 2);
+    training:$("training").value, speed:$("speed").value, pitch:$("pitch").value, a:pointA, b:pointB}, null, 2);
 }
 function restoreTransport() {
   const saved = pendingSession;
@@ -312,6 +312,7 @@ function openSession(raw) {
   const validTime = value => Number.isFinite(value) && value >= 0;
   if (data?.version !== 1 || typeof data.title !== "string" || typeof data.lyrics !== "string" ||
       !validTime(data.position) || !Array.from($("speed").options).some(o => o.value === data.speed) ||
+      (data.training !== undefined && !["0","2","4"].includes(data.training)) ||
       !["preserve","vary"].includes(data.pitch) || !(data.a === null || validTime(data.a)) ||
       !(data.b === null || (validTime(data.b) && data.a !== null && data.b - data.a >= 0.25)))
     throw Error("Sessão inválida ou versão incompatível.");
@@ -323,6 +324,7 @@ function openSession(raw) {
   $("upload").value = "";
   score.title = data.title; score.lines = lines;
   pendingSession = data; pointA = data.a; pointB = data.b;
+  $("training").value = data.training ?? "0";
   $("speed").value = data.speed; $("pitch").value = data.pitch;
   if ("preservesPitch" in audio) audio.preservesPitch = data.pitch === "preserve";
   build(); updateLoop(); tell("Sessão aberta. Selecione a gravação para retomar.");

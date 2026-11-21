@@ -2,6 +2,8 @@
 
 ## 2026-11-21
 
+O backup e a biblioteca recuperam o treino de velocidade escolhido. Sessões anteriores abrem com o treino desligado.
+
 Treino progressivo no loop A/B: escolha duas ou quatro voltas para avançar ao próximo nível de velocidade. O contador acompanha o trecho durante a reprodução.
 
 Guarde ensaios com nomes diferentes na biblioteca local. Cada entrada recupera letra, posição e ajustes. Selecione a gravação novamente ao abrir. Use a exportação JSON para manter uma cópia fora do navegador. O CI disponibiliza capturas em duas larguras.
