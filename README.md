@@ -98,3 +98,7 @@ Guarde ensaios com nomes diferentes na biblioteca local. Cada entrada recupera l
 [Ver testes e capturas de celular e computador](https://github.com/ykauttiz/contratempo/actions/workflows/contratempo-tests.yml). Na execução, abra o artefato **capturas-chromium** ou **capturas-firefox**. As imagens usam dados fictícios.
 
 Treino progressivo no loop A/B: escolha duas ou quatro voltas para avançar ao próximo nível de velocidade. O contador acompanha o trecho durante a reprodução.
+
+## Publicar uma versão
+
+Atualize `RELEASE.md` com as mudanças verificadas. Para marcar uma entrega, use na branch principal um commit com o título `release(vAAAA.MM.DD) Título da atualização`. Para uma segunda edição no mesmo dia, acrescente um número à versão, como `vAAAA.MM.DD.1`. O GitHub Actions publica a release após a aprovação dos testes. Commits comuns continuam atualizando o site.

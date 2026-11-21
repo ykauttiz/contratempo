@@ -1,5 +1,3 @@
-## Novidades
+O modo de treino progressivo é salvo e recuperado com o ensaio. Sessões antigas abrem com o treino desligado.
 
-Treino progressivo no loop A/B: escolha duas ou quatro voltas para avançar ao próximo nível de velocidade. O contador acompanha o trecho durante a reprodução.
-
-[Experimentar](https://ykauttiz.github.io/contratempo/). [Histórico completo](https://github.com/ykauttiz/contratempo/blob/main/CHANGELOG.md).
+A suíte de navegador passou a exercitar os fluxos de uso em 320, 375 e 1280 pixels.
