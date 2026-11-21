@@ -90,6 +90,16 @@ function updateLoop() {
     pointB === null ? "Início em " + stamp(pointA, true) + ". Escolha o fim." :
     "Repetindo de " + stamp(pointA, true) + " até " + stamp(pointB, true) + ".";
 }
+$("verse-loop").onclick = () => {
+  if (!audio.readyState || !Number.isFinite(audio.duration)) return tell("Carregue uma gravação primeiro.");
+  render();
+  const line = score.lines[selected];
+  if (!line?.[1]) return tell("Selecione um verso para repetir.");
+  const end = Math.min(score.lines[selected + 1]?.[0] ?? audio.duration, audio.duration);
+  if (end - line[0] < 0.25) return tell("Este verso é curto demais para repetir. Marque um trecho maior com A e B.");
+  pointA = line[0]; pointB = end; audio.currentTime = pointA;
+  updateLoop(); tell($("range").textContent);
+};
 $("mark-a").onclick = () => {
   if (!audio.readyState) return tell("Carregue um áudio primeiro.");
   pointA = audio.currentTime; pointB = null; updateLoop(); tell($("range").textContent);

@@ -33,7 +33,7 @@ header,footer,.actions,.settings{display:flex;align-items:center;gap:.75rem;flex
 <label class="font-size" hidden id="font-control">Tamanho da letra<input id="font" type="range" min="70" max="160" value="100"></label>
 <div class="settings"><label>Velocidade<select id="speed"><option value=".5">0,5×</option><option value=".75">0,75×</option><option selected value="1">1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option></select></label>
 <label id="pitch-control" hidden>Tom do áudio<select id="pitch"><option value="preserve">Manter original</option><option value="vary">Variar com a velocidade</option></select></label></div>
-<fieldset><legend>Repetir um trecho</legend><div class="actions"><button id="mark-a">Marcar A</button><button id="mark-b">Marcar B</button><button id="clear" disabled>Limpar</button></div><small id="range">Marque o início e depois o fim durante o ensaio.</small></fieldset>
+<fieldset><legend>Repetir um trecho</legend><div class="actions"><button id="verse-loop">Repetir verso atual</button><button id="mark-a">Marcar A</button><button id="mark-b">Marcar B</button><button id="clear" disabled>Limpar</button></div><small id="range">Marque o início e depois o fim durante o ensaio.</small></fieldset>
 </section>
 <section class="queue"><h2>Versos</h2><ol id="lines" aria-label="Ir para um verso"></ol></section>
 </div>
@@ -138,6 +138,16 @@ function updateLoop() {
     pointB === null ? "Início em " + stamp(pointA, true) + ". Escolha o fim." :
     "Repetindo de " + stamp(pointA, true) + " até " + stamp(pointB, true) + ".";
 }
+$("verse-loop").onclick = () => {
+  if (!audio.readyState || !Number.isFinite(audio.duration)) return tell("Carregue uma gravação primeiro.");
+  render();
+  const line = score.lines[selected];
+  if (!line?.[1]) return tell("Selecione um verso para repetir.");
+  const end = Math.min(score.lines[selected + 1]?.[0] ?? audio.duration, audio.duration);
+  if (end - line[0] < 0.25) return tell("Este verso é curto demais para repetir. Marque um trecho maior com A e B.");
+  pointA = line[0]; pointB = end; audio.currentTime = pointA;
+  updateLoop(); tell($("range").textContent);
+};
 $("mark-a").onclick = () => {
   if (!audio.readyState) return tell("Carregue um áudio primeiro.");
   pointA = audio.currentTime; pointB = null; updateLoop(); tell($("range").textContent);

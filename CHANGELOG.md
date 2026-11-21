@@ -2,6 +2,8 @@
 
 ## 2026-11-21
 
+Selecione um verso e clique em **Repetir verso atual**. O player usa a marca do verso seguinte como fim. No último verso, usa o fim do áudio. Clique em play para ouvir e em **Limpar** para sair da repetição.
+
 A marcação pelo relógio do áudio agora preserva edições de letra e offset ainda não aplicadas.
 
 ## 2026-11-20 · Estúdio de ensaio
