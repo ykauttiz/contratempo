@@ -18,7 +18,7 @@ with sync_playwright() as engine, TemporaryDirectory() as folder:
     browser = backend.launch(executable_path=binary)
     server = ThreadingHTTPServer(("127.0.0.1", 0), partial(SimpleHTTPRequestHandler, directory=root / "docs"))
     Thread(target=server.serve_forever, daemon=True).start()
-    for width in (375, 1280):
+    for width in (320, 375, 1280):
         page = browser.new_page(viewport={"width": width, "height": 840}, reduced_motion="reduce")
         errors = []
         page.on("pageerror", lambda error: errors.append(str(error)))
