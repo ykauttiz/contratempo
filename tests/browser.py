@@ -24,6 +24,10 @@ with sync_playwright() as engine, TemporaryDirectory() as folder:
         page.on("pageerror", lambda error: errors.append(str(error)))
         page.goto(f"http://127.0.0.1:{server.server_port}/")
         page.wait_for_function("audio.readyState >= 1")
+        # Exercise the local recording flow. The standard-library HTTP fixture
+        # does not support byte-range requests for seeking in a remote MP3.
+        page.locator("#upload").set_input_files(root / "docs/ensaio.mp3")
+        page.wait_for_function("audio.currentSrc.startsWith('blob:') && audio.readyState >= 2")
         assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
         page.locator("#lines button").nth(1).click()
         page.locator("#wave-load").click()
