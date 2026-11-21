@@ -34,3 +34,9 @@ input,button,select,textarea { background:#20221e }
 #verse-loop:hover,#apply:hover { color:#23251d; background:#ffd792 }
 .present .studio-nav { display:none }
 @media(max-width:720px){.disc{right:-18%;width:50%}.studio-nav{gap:.2rem 1.1rem}.jacket{width:75%}}
+.transport,.queue-tools {display:flex;align-items:center;flex-wrap:wrap;gap:.45rem;margin:.4rem 0 1.2rem}
+.transport button {flex:1 1 7rem;border-color:#706a55}
+.transport button:nth-child(2) {background:#f5cc84;color:#242219}
+.queue-tools {justify-content:space-between;border-top:1px solid var(--edge);padding-top:.7rem}
+.queue-tools span {font-variant-numeric:tabular-nums}
+.present .transport {align-self:center}

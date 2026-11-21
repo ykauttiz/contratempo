@@ -3,7 +3,7 @@ const $ = id => document.getElementById(id);
 const score = JSON.parse($("score").textContent);
 const audio = $("audio");
 const past = [], future = [];
-let selected = -2, buttons = [], localUrl, pointA = null, pointB = null, importId = 0;
+let selected = -2, buttons = new Map(), localUrl, pointA = null, pointB = null, importId = 0;
 function tell(message) { $("status").textContent = message; }
 function stamp(seconds, precise = false) {
   const ms = Math.round(seconds * 1000);
@@ -45,58 +45,94 @@ function render() {
   }
   const index = lo - 1;
   if (index === selected) return;
-  buttons[selected]?.removeAttribute("aria-current");
-  buttons[index]?.setAttribute("aria-current", "true");
+  buttons.get(selected)?.removeAttribute("aria-current");
+  buttons.get(index)?.setAttribute("aria-current", "true");
   $("current").textContent = index < 0 ? "Introdução" : score.lines[index][1] || "Pausa";
   const next = score.lines[index + 1]?.[1];
   $("next").textContent = next ? "A seguir · " + next : "";
   selected = index;
 }
+const queueSize = 60;
+let queuePage = 0, matches = [], searchIndex = [];
+const normalizeLyric = text => text.normalize("NFD").replace(/\p{M}/gu,"").toLocaleLowerCase("pt-BR");
+function seekCue(index) {
+  if (!audio.readyState || !Number.isFinite(audio.duration)) return tell("Carregue uma gravação primeiro.");
+  const line = score.lines[index];
+  if (!line || line[0] > audio.duration) return tell("Esse trecho fica fora da gravação.");
+  audio.currentTime = line[0];
+  render();
+}
+function paintQueue() {
+  const pages = Math.max(1,Math.ceil(matches.length / queueSize));
+  queuePage = Math.min(pages - 1,Math.max(0,queuePage));
+  const start = queuePage * queueSize;
+  const fragment = document.createDocumentFragment();
+  buttons.clear();
+  for (const [offset,index] of matches.slice(start,start + queueSize).entries()) {
+    const [at,line] = score.lines[index];
+    const row = document.createElement("li"), button = document.createElement("button");
+    const time = document.createElement("time");
+    time.textContent = stamp(at,at % 1 !== 0);
+    button.append(time,line || "Pausa");
+    if (index === selected) button.setAttribute("aria-current","true");
+    button.onclick = () => seekCue(index);
+    button.onkeydown = event => {
+      const position = start + offset;
+      const destination = {ArrowDown:position+1,ArrowUp:position-1,Home:0,End:matches.length-1}[event.key];
+      if (destination === undefined) return;
+      event.preventDefault();
+      const target = Math.min(matches.length-1,Math.max(0,destination));
+      const nextPage = Math.floor(target / queueSize);
+      if (nextPage !== queuePage) {queuePage = nextPage; paintQueue();}
+      buttons.get(matches[target])?.focus();
+    };
+    buttons.set(index,button);row.append(button);fragment.append(row);
+  }
+  $("lines").replaceChildren(fragment);
+  $("queue-pages").hidden = pages <= 1;
+  $("queue-page").textContent = (queuePage + 1) + " / " + pages;
+  $("queue-back").disabled = queuePage === 0;
+  $("queue-forward").disabled = queuePage === pages - 1;
+}
 function filterVerses() {
-  const simplify = text => text.normalize("NFD").replace(/\p{M}/gu, "").toLocaleLowerCase("pt-BR");
-  const term = simplify($("verse-search").value.trim());
-  let count = 0;
-  buttons.forEach((button, index) => {
-    const matches = !term || simplify(score.lines[index][1] || "Pausa").includes(term);
-    button.parentElement.hidden = !matches;
-    if (matches) count++;
-  });
-  $("verse-count").textContent = term ? (count ? count + " de " + buttons.length + " trechos" : "Nenhum trecho encontrado. Tente outra palavra.") : "";
+  const term = normalizeLyric($("verse-search").value.trim());
+  matches = [];
+  searchIndex.forEach((text,index) => {if (text.includes(term)) matches.push(index);});
+  queuePage = 0;
+  paintQueue();
+  $("verse-count").textContent = term ? (matches.length ? matches.length + " de " + score.lines.length + " trechos" : "Nenhum trecho encontrado. Tente outra palavra.") : "";
 }
 $("verse-search").oninput = filterVerses;
+$("queue-back").onclick = () => {queuePage--;paintQueue();};
+$("queue-forward").onclick = () => {queuePage++;paintQueue();};
+for (const [id,step] of [["previous-cue",-1],["next-cue",1],["replay-cue",0]]) {
+  $(id).onclick = () => {
+    render();
+    seekCue(Math.max(0,Math.min(score.lines.length-1,selected+step)));
+  };
+}
+const editorPanel = $("cue").closest("details");
+let cueOptionsReady = false;
+function prepareCueOptions() {
+  if (!editorPanel.open || cueOptionsReady) return;
+  const fragment = document.createDocumentFragment();
+  score.lines.forEach(([at,line],index) => fragment.append(new Option(stamp(at,true) + " · " + (line || "Pausa"),index)));
+  $("cue").replaceChildren(fragment);
+  cueOptionsReady = true;
+}
+editorPanel.addEventListener("toggle",prepareCueOptions);
 function build() {
   $("title").textContent = score.title;
   const total = score.lines.filter(([, line]) => line).length;
   $("track-info").textContent = total + (total === 1 ? " verso sincronizado" : " versos sincronizados");
-  const fragment = document.createDocumentFragment();
-  buttons = score.lines.map(([at, line], index) => {
-    const row = document.createElement("li"), button = document.createElement("button");
-    const time = document.createElement("time");
-    time.textContent = stamp(at, at % 1 !== 0);
-    button.append(time, line || "Pausa");
-    button.onclick = () => {
-      if (!audio.readyState) return tell("Escolha um áudio e aguarde o carregamento.");
-      audio.currentTime = Math.min(audio.duration, at);
-      render();
-    };
-    button.onkeydown = event => {
-      if (!["ArrowDown","ArrowUp","Home","End"].includes(event.key)) return;
-      const visible = buttons.filter(item => !item.parentElement.hidden);
-      const position = visible.indexOf(button);
-      const dest = {ArrowDown:position + 1, ArrowUp:position - 1, Home:0, End:visible.length - 1}[event.key];
-      event.preventDefault();
-      visible[Math.max(0, Math.min(visible.length - 1, dest))].focus();
-    };
-    row.append(button); fragment.append(row);
-    return button;
-  });
-  $("lines").replaceChildren(fragment);
+  selected = -2;
+  searchIndex = score.lines.map(([,text]) => normalizeLyric(text || "Pausa"));
   filterVerses();
-  const options = score.lines.map(([at, line], index) => new Option(stamp(at, true) + " · " + (line || "Pausa"), index));
-  $("cue").replaceChildren(...options);
+  cueOptionsReady = false;
+  $("cue").replaceChildren();
+  prepareCueOptions();
   $("editor").value = serialize();
   $("offset").value = "0";
-  selected = -2;
   render();
 }
 function updateLoop() {

@@ -2,6 +2,8 @@
 
 ## 2026-11-21
 
+Use **Verso anterior**, **Reiniciar verso** e **Próximo verso** na mesa de reprodução. A busca cobre até 10 mil marcações e a fila exibe 60 por página. Home e End percorrem o conjunto filtrado inteiro. A lista completa de marcas para edição só é montada ao abrir o editor.
+
 Busque palavras na fila de versos, inclusive sem acentos. As setas, Home e End percorrem os resultados visíveis enquanto o ensaio continua.
 
 - Sala de ensaio com navegação para reprodução, fila de versos e arquivos, capa em alto contraste e monitor redesenhado.

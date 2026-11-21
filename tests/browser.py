@@ -61,6 +61,10 @@ with sync_playwright() as engine, TemporaryDirectory() as folder:
         page.keyboard.press("ArrowDown")
         page.keyboard.press("Enter")
         expect(page.locator("#current")).to_have_text("Na curva da madrugada")
+        page.locator("#previous-cue").click()
+        expect(page.locator("#current")).to_have_text("A chuva ficou pra trás")
+        page.locator("#next-cue").click()
+        expect(page.locator("#current")).to_have_text("Na curva da madrugada")
         page.locator("#speed").select_option(".75")
         assert page.locator("audio").evaluate("el => el.playbackRate") == .75
         page.locator("#present").click()
@@ -97,6 +101,15 @@ with sync_playwright() as engine, TemporaryDirectory() as folder:
         page.locator("#resume").click()
         expect(page.locator("h1")).to_have_text("Letra")
         expect(page.locator("#lines time").first).to_have_text("00:00.500")
+        page.locator("#lrc").set_input_files({"name":"Longa.lrc","mimeType":"text/plain",
+            "buffer":"\n".join(f"[{i//60:02d}:{i%60:02d}]Linha {i}" for i in range(10000)).encode()})
+        expect(page.locator("#queue-page")).to_have_text("1 / 167")
+        expect(page.locator("#lines button")).to_have_count(60)
+        expect(page.locator("#cue option")).to_have_count(0)
+        page.locator("#lines button").first.press("End")
+        expect(page.locator("#lines button").last).to_be_focused()
+        expect(page.locator("#lines button").last).to_contain_text("Linha 9999")
+        expect(page.locator("#lines button")).to_have_count(40)
         assert not errors, errors
         page.close()
     server.shutdown()
