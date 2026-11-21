@@ -12,6 +12,10 @@ Abra uma gravação, volte ao verso que escapou e ensaie de novo mais devagar. O
 
 ![Sala de ensaio com a faixa Depois da chuva e os controles de reprodução.](assets/demonstracao.webp)
 
+## Aparência e navegação
+
+No cabeçalho, escolha **Sistema**, **Claro** ou **Escuro**. Sistema acompanha o aparelho. O navegador guarda a escolha localmente para a próxima visita. Use Tab para chegar ao atalho de conteúdo e aos controles. As transições respeitam a preferência de movimento reduzido.
+
 ## Ensaie direto no navegador
 
 1. Abra a [sala de ensaio](https://ykauttiz.github.io/contratempo/) e toque a faixa de exemplo. Clique em um verso para ouvir a partir dele. Com o foco na lista, use ↑ e ↓ para escolher outro e Enter para ir até ele.

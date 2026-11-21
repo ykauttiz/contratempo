@@ -72,11 +72,69 @@ section[id], h2[id] { scroll-margin-top:1rem }
   details[open] > summary ~ p { animation:details-open .2s ease-out both }
   @keyframes details-open { from { opacity:.7; transform:translateY(3px) } to { opacity:1; transform:none } }
 }
+
+/* A preferência só afeta a tela. O relatório impresso preserva sua paleta. */
+.appearance { display: inline-flex; align-items: center; gap: .5rem; margin: 0; font: 600 .875rem/1.3 system-ui, sans-serif }
+.appearance select { min-height: 44px; width: auto; max-width: 100%; padding: .45rem .55rem; border: 1px solid currentColor; border-radius: .4rem; background: transparent; color: inherit; font: inherit }
+@media screen {
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --surface: #fffdf6; --raised: #eae3cf; --ink: #25251c; --muted: #514d3b;
+    --quiet: #514d3b; --accent: #714b05; --green: #714b05; --coral: #714b05; --gold: #714b05; --paper: #fffdf6;
+    --line: #9c9378; --edge: #9c9378; --panel: #fffdf6;
+    background: #f7f3e8; color: var(--ink);
+  }
+  :root[data-theme="light"] body { background: transparent; color: var(--ink) }
+  :root[data-theme="light"] :is(.monitor,.queue,.workspace,.studio-nav,form,details) {
+    background: var(--surface); color: var(--ink); border-color: var(--line);
+  }
+  :root[data-theme="light"] :is(.metric,.segment,.filters,.grid,.intake #preview,#parts label,.queue button,.scroll tr:nth-child(even),th,.scroll thead,#summary,#origin) {
+    background: var(--raised); color: var(--ink); border-color: var(--line);
+  }
+  :root[data-theme="light"] :is(input,textarea,select,button,.studio-nav a) {
+    background-color: var(--surface); color: var(--ink); border-color: var(--line);
+  }
+  :root[data-theme="light"] :is(header a,footer a,.project-copy .label,.links a:first-child,.monitor .label,time,summary,.metric strong,.segment td:nth-child(5),#priority-summary) { color: var(--accent) }
+  :root[data-theme="light"] :is(#current,.monitor #current,.queue button,header b) { color: var(--ink) }
+  :root[data-theme="light"] :is(.workspace p,#next,.project-copy p:not(.label),.intro>p:not(.label)) { color: var(--muted) }
+  :root[data-theme="light"] :is(button[aria-pressed=true],.queue button[aria-current=true],#verse-loop,#apply) { background: var(--accent); color: var(--surface) }
+  :root[data-theme="light"] :focus-visible { outline-color: var(--accent) }
+  :root[data-theme="light"] :is(.sleeve) { color: #fff9ec }
+
+}
 </style>
 </head>
 <body>
 <a class="skip" href="#studio">Ir para o ensaio</a>
-<header><a class="brand" href="#studio"><i aria-hidden="true"></i> Contratempo</a><a class="source" href="https://github.com/ykauttiz/contratempo">GitHub ↗</a></header>
+<header><a class="brand" href="#studio"><i aria-hidden="true"></i> Contratempo</a><a class="source" href="https://github.com/ykauttiz/contratempo">GitHub ↗</a><label class="appearance">Tema
+  <select id="appearance" aria-label="Tema da interface">
+    <option value="system">Sistema</option>
+    <option value="light">Claro</option>
+    <option value="dark">Escuro</option>
+  </select>
+</label>
+<script>
+(() => {
+  const select = document.getElementById("appearance");
+  const key = "kaue.appearance";
+  const system = matchMedia("(prefers-color-scheme: dark)");
+  try {
+    const saved = localStorage.getItem(key);
+    if (saved === "dark" || saved === "light") select.value = saved;
+  } catch { /* A escolha também funciona com o armazenamento bloqueado. */ }
+  function apply() {
+    document.documentElement.dataset.theme = select.value === "system"
+      ? (system.matches ? "dark" : "light") : select.value;
+  }
+  select.addEventListener("change", () => {
+    apply();
+    try { localStorage.setItem(key, select.value); } catch { /* Só nesta página. */ }
+  });
+  system.addEventListener("change", apply);
+  apply();
+})();
+</script>
+</header>
 <main id="studio">
 <section class="sleeve" aria-labelledby="title">
 <div class="jacket"><p class="label">Sala de ensaio</p><h1 id="title"></h1><p id="track-info"></p></div><div class="disc" aria-hidden="true"><i></i></div>

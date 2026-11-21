@@ -13,7 +13,35 @@
   <header class="shell masthead">
     <a class="brand" href="../portfolio/" aria-label="Kauê, início"><span aria-hidden="true">K</span> Kauê</a>
     <a href="https://github.com/ykauttiz">GitHub ↗</a>
-  </header>
+  <label class="appearance">Tema
+  <select id="appearance" aria-label="Tema da interface">
+    <option value="system">Sistema</option>
+    <option value="light">Claro</option>
+    <option value="dark">Escuro</option>
+  </select>
+</label>
+<script>
+(() => {
+  const select = document.getElementById("appearance");
+  const key = "kaue.appearance";
+  const system = matchMedia("(prefers-color-scheme: dark)");
+  try {
+    const saved = localStorage.getItem(key);
+    if (saved === "dark" || saved === "light") select.value = saved;
+  } catch { /* A escolha também funciona com o armazenamento bloqueado. */ }
+  function apply() {
+    document.documentElement.dataset.theme = select.value === "system"
+      ? (system.matches ? "dark" : "light") : select.value;
+  }
+  select.addEventListener("change", () => {
+    apply();
+    try { localStorage.setItem(key, select.value); } catch { /* Só nesta página. */ }
+  });
+  system.addEventListener("change", apply);
+  apply();
+})();
+</script>
+</header>
   <main class="shell">
     <section class="intro" aria-labelledby="titulo">
       <p class="label">Portfólio · ykauttiz</p>
