@@ -52,6 +52,18 @@ function render() {
   $("next").textContent = next ? "A seguir · " + next : "";
   selected = index;
 }
+function filterVerses() {
+  const simplify = text => text.normalize("NFD").replace(/\p{M}/gu, "").toLocaleLowerCase("pt-BR");
+  const term = simplify($("verse-search").value.trim());
+  let count = 0;
+  buttons.forEach((button, index) => {
+    const matches = !term || simplify(score.lines[index][1] || "Pausa").includes(term);
+    button.parentElement.hidden = !matches;
+    if (matches) count++;
+  });
+  $("verse-count").textContent = term ? (count ? count + " de " + buttons.length + " trechos" : "Nenhum trecho encontrado. Tente outra palavra.") : "";
+}
+$("verse-search").oninput = filterVerses;
 function build() {
   $("title").textContent = score.title;
   const total = score.lines.filter(([, line]) => line).length;
@@ -68,15 +80,18 @@ function build() {
       render();
     };
     button.onkeydown = event => {
-      const dest = {ArrowDown:index + 1, ArrowUp:index - 1, Home:0, End:buttons.length - 1}[event.key];
-      if (dest === undefined) return;
+      if (!["ArrowDown","ArrowUp","Home","End"].includes(event.key)) return;
+      const visible = buttons.filter(item => !item.parentElement.hidden);
+      const position = visible.indexOf(button);
+      const dest = {ArrowDown:position + 1, ArrowUp:position - 1, Home:0, End:visible.length - 1}[event.key];
       event.preventDefault();
-      buttons[Math.max(0, Math.min(buttons.length - 1, dest))].focus();
+      visible[Math.max(0, Math.min(visible.length - 1, dest))].focus();
     };
     row.append(button); fragment.append(row);
     return button;
   });
   $("lines").replaceChildren(fragment);
+  filterVerses();
   const options = score.lines.map(([at, line], index) => new Option(stamp(at, true) + " · " + (line || "Pausa"), index));
   $("cue").replaceChildren(...options);
   $("editor").value = serialize();

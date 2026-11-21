@@ -88,3 +88,5 @@ Ao mudar a velocidade, escolha se quer manter o tom original da gravação ou ac
 A estrutura está em `rehearsal.html`, o estilo em `web/studio.css` e o player em `web/player.js`. O exportador incorpora tudo em um HTML portátil. Após uma alteração, rode `python build_demo.py` e `python -m unittest -v`. O teste de interface usa Playwright e Chromium, em larguras de 375 e 1280 pixels. Para reproduzir, instale `playwright==1.55.0`, execute `python -m playwright install chromium` e depois `python tests/browser.py`.
 
 Selecione um verso e clique em **Repetir verso atual**. O player usa a marca do verso seguinte como fim. No último verso, usa o fim do áudio. Clique em play para ouvir e em **Limpar** para sair da repetição.
+
+Busque palavras na fila de versos, inclusive sem acentos. As setas, Home e End percorrem os resultados visíveis enquanto o ensaio continua.

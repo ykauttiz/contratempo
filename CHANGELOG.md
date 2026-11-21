@@ -2,6 +2,8 @@
 
 ## 2026-11-21
 
+Busque palavras na fila de versos, inclusive sem acentos. As setas, Home e End percorrem os resultados visíveis enquanto o ensaio continua.
+
 - Sala de ensaio com navegação para reprodução, fila de versos e arquivos, capa em alto contraste e monitor redesenhado.
 
 Selecione um verso e clique em **Repetir verso atual**. O player usa a marca do verso seguinte como fim. No último verso, usa o fim do áudio. Clique em play para ouvir e em **Limpar** para sair da repetição.

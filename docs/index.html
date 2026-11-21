@@ -59,7 +59,7 @@ input,button,select,textarea { background:#20221e }
 <label id="pitch-control" hidden>Tom do áudio<select id="pitch"><option value="preserve">Manter original</option><option value="vary">Variar com a velocidade</option></select></label></div>
 <fieldset><legend>Repetir um trecho</legend><div class="actions"><button id="verse-loop">Repetir verso atual</button><button id="mark-a">Marcar A</button><button id="mark-b">Marcar B</button><button id="clear" disabled>Limpar</button></div><small id="range">Marque o início e depois o fim durante o ensaio.</small></fieldset>
 </section>
-<section class="queue" id="fila"><h2>Versos</h2><ol id="lines" aria-label="Ir para um verso"></ol></section>
+<section class="queue" id="fila"><h2>Versos</h2><label>Buscar na letra<input id="verse-search" type="search" placeholder="Palavra ou trecho" aria-controls="lines"></label><p id="verse-count" role="status"></p><ol id="lines" aria-label="Ir para um verso"></ol></section>
 </div>
 <section class="workspace" id="arquivos"><h2>Seu ensaio</h2><p>Selecione ou arraste a gravação e a letra LRC para cá. Os arquivos ficam neste navegador.</p>
 <div class="settings"><label>Usar áudio local<input id="upload" type="file" accept="audio/*"></label><label>Importar letra LRC<input id="lrc" type="file" accept=".lrc,text/plain"></label></div>
@@ -124,6 +124,18 @@ function render() {
   $("next").textContent = next ? "A seguir · " + next : "";
   selected = index;
 }
+function filterVerses() {
+  const simplify = text => text.normalize("NFD").replace(/\p{M}/gu, "").toLocaleLowerCase("pt-BR");
+  const term = simplify($("verse-search").value.trim());
+  let count = 0;
+  buttons.forEach((button, index) => {
+    const matches = !term || simplify(score.lines[index][1] || "Pausa").includes(term);
+    button.parentElement.hidden = !matches;
+    if (matches) count++;
+  });
+  $("verse-count").textContent = term ? (count ? count + " de " + buttons.length + " trechos" : "Nenhum trecho encontrado. Tente outra palavra.") : "";
+}
+$("verse-search").oninput = filterVerses;
 function build() {
   $("title").textContent = score.title;
   const total = score.lines.filter(([, line]) => line).length;
@@ -140,15 +152,18 @@ function build() {
       render();
     };
     button.onkeydown = event => {
-      const dest = {ArrowDown:index + 1, ArrowUp:index - 1, Home:0, End:buttons.length - 1}[event.key];
-      if (dest === undefined) return;
+      if (!["ArrowDown","ArrowUp","Home","End"].includes(event.key)) return;
+      const visible = buttons.filter(item => !item.parentElement.hidden);
+      const position = visible.indexOf(button);
+      const dest = {ArrowDown:position + 1, ArrowUp:position - 1, Home:0, End:visible.length - 1}[event.key];
       event.preventDefault();
-      buttons[Math.max(0, Math.min(buttons.length - 1, dest))].focus();
+      visible[Math.max(0, Math.min(visible.length - 1, dest))].focus();
     };
     row.append(button); fragment.append(row);
     return button;
   });
   $("lines").replaceChildren(fragment);
+  filterVerses();
   const options = score.lines.map(([at, line], index) => new Option(stamp(at, true) + " · " + (line || "Pausa"), index));
   $("cue").replaceChildren(...options);
   $("editor").value = serialize();

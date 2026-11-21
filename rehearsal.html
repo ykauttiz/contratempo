@@ -23,7 +23,7 @@
 <label id="pitch-control" hidden>Tom do áudio<select id="pitch"><option value="preserve">Manter original</option><option value="vary">Variar com a velocidade</option></select></label></div>
 <fieldset><legend>Repetir um trecho</legend><div class="actions"><button id="verse-loop">Repetir verso atual</button><button id="mark-a">Marcar A</button><button id="mark-b">Marcar B</button><button id="clear" disabled>Limpar</button></div><small id="range">Marque o início e depois o fim durante o ensaio.</small></fieldset>
 </section>
-<section class="queue" id="fila"><h2>Versos</h2><ol id="lines" aria-label="Ir para um verso"></ol></section>
+<section class="queue" id="fila"><h2>Versos</h2><label>Buscar na letra<input id="verse-search" type="search" placeholder="Palavra ou trecho" aria-controls="lines"></label><p id="verse-count" role="status"></p><ol id="lines" aria-label="Ir para um verso"></ol></section>
 </div>
 <section class="workspace" id="arquivos"><h2>Seu ensaio</h2><p>Selecione ou arraste a gravação e a letra LRC para cá. Os arquivos ficam neste navegador.</p>
 <div class="settings"><label>Usar áudio local<input id="upload" type="file" accept="audio/*"></label><label>Importar letra LRC<input id="lrc" type="file" accept=".lrc,text/plain"></label></div>
