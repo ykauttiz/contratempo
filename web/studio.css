@@ -45,3 +45,9 @@ input,button,select,textarea { background:#20221e }
   .queue button[aria-current=true] {animation: reveal-state 220ms ease-out both}
   @keyframes reveal-state {from{opacity:.7;transform:translateY(3px)}to{opacity:1;transform:none}}
 }
+
+@media (max-width:720px) {
+  .desk,.workspace .settings {grid-template-columns:minmax(0,1fr)}
+  .monitor,.queue,fieldset,input,select,audio {min-inline-size:0}
+  input[type=file] {inline-size:100%}
+}
