@@ -6,6 +6,8 @@ Abra uma gravação, volte ao verso que escapou e ensaie de novo mais devagar. O
 
 **[Abrir o Contratempo](https://ykauttiz.github.io/contratempo/)** · Letra e acompanhamento instrumental originais. Aperte play, escolha um verso ou reduza a velocidade para 0,75×.
 
+![Sala de ensaio com a faixa Depois da chuva e os controles de reprodução.](assets/demonstracao.webp)
+
 ## Ensaie direto no navegador
 
 1. Abra a [sala de ensaio](https://ykauttiz.github.io/contratempo/) e toque a faixa de exemplo. Clique em um verso para ouvir a partir dele. Com o foco na lista, use ↑ e ↓ para escolher outro e Enter para ir até ele.
