@@ -4,9 +4,19 @@
 
 Abra uma gravação, volte ao verso que escapou e ensaie de novo mais devagar. O **Contratempo** usa as marcações de tempo de um arquivo LRC para acompanhar uma música. No navegador, a própria gravação marca o tempo.
 
-**[Tocar a demo de 12 segundos](https://ykauttiz.github.io/contratempo/)** · Letra e acompanhamento instrumental originais. Aperte play, escolha um verso ou reduza a velocidade para 0,75×.
+**[Abrir o Contratempo](https://ykauttiz.github.io/contratempo/)** · Letra e acompanhamento instrumental originais. Aperte play, escolha um verso ou reduza a velocidade para 0,75×.
 
-## Ensaiar com a sua música
+## Ensaie direto no navegador
+
+1. Abra a [sala de ensaio](https://ykauttiz.github.io/contratempo/) e toque a faixa de exemplo. Clique em um verso para ouvir a partir dele. Com o foco na lista, use ↑ e ↓ para escolher outro e Enter para ir até ele.
+2. Em **Seu ensaio**, selecione ou arraste um áudio e a letra LRC em UTF-8. O navegador lê os arquivos no dispositivo. A demo acompanha a linha inteira.
+3. Para praticar uma passagem, marque **A** no início e **B** no fim, com pelo menos 0,25 s de intervalo. Dê play para repetir. **Apresentar** amplia a letra; Esc volta ao ensaio.
+4. Abra **Editar letra e sincronização**. Selecione um verso e marque seu início enquanto ouve. Para corrigir a letra inteira, edite os tempos ou informe um ajuste em milissegundos e clique em **Aplicar edição**. Por exemplo, +250 adianta cada marca em um quarto de segundo. Você pode desfazer e refazer as últimas 20 edições.
+5. Escolha LRC para retomar a edição, SRT para um editor de vídeo ou WebVTT para um player web. Baixe o arquivo antes de fechar a página. O navegador exporta a versão aplicada.
+
+O leitor aceita `[mm:ss]`, frações de um a três dígitos, várias marcas no início da mesma linha, pausas e `[offset:250]`. Tempos fora de ordem são ordenados; versos simultâneos são agrupados. O limite do importador web é de 1 MiB e 10 mil marcações. A reprodução depende dos codecs disponíveis no navegador.
+
+## Gerar uma sala de ensaio offline
 
 Baixe o repositório, abra o terminal na pasta e use Python 3.10 ou superior. No Windows, você também pode usar `py` no lugar de `python`.
 
@@ -29,6 +39,8 @@ Cada legenda vai até a próxima marcação. Uma linha vazia indica silêncio. S
 ```sh
 python lyrics.py demo.lrc
 ```
+
+Para escolher a duração do último verso sem uma marca de fim, acrescente `--last-duration 2.5` à exportação SRT ou WebVTT.
 
 O modo terminal tem relógio próprio. Inicie a gravação separadamente ou use `--start 45` para começar no segundo 45.
 
@@ -53,9 +65,9 @@ Open the [live rehearsal demo](https://ykauttiz.github.io/contratempo/), or expo
 
 ## Como o código segue a música
 
-Em um arquivo LRC, uma linha como `[00:03.00]A chuva ficou pra trás` diz que o verso começa no terceiro segundo. Em `lyrics.py`, a função `timeline` lê essas marcas, aplica o deslocamento global do arquivo e agrupa versos simultâneos. O modo terminal usa um relógio monotônico; o modo navegador consulta a posição do áudio.
+Em um arquivo LRC, uma linha como `[00:03.00]A chuva ficou pra trás` diz que o verso começa no terceiro segundo. Em `lrc.py`, a função `timeline` lê essas marcas, aplica o deslocamento global do arquivo e agrupa versos simultâneos. O modo terminal usa um relógio monotônico; o modo navegador consulta a posição do áudio.
 
-Em `exports.py`, a mesma linha do tempo gera tanto a folha de ensaio quanto as legendas. A folha exportada contém a letra e o player; a gravação é escolhida no dispositivo. No modelo `rehearsal.html`, uma busca binária identifica o último verso iniciado sempre que o áudio muda de posição. A demo publicada em `docs/` inclui uma gravação curta para experimentar sem preparar arquivos.
+Em `exports.py`, a mesma linha do tempo gera tanto a folha de ensaio quanto as legendas. A folha exportada contém a letra e o player; a gravação é escolhida no dispositivo. Em `web/player.js`, uma busca binária identifica o último verso iniciado sempre que o áudio muda de posição. A demo publicada em `docs/` inclui uma gravação curta para experimentar sem preparar arquivos.
 
 Para reproduzir a verificação, execute `python -m unittest -v` na raiz. Uma das verificações compara a página publicada ao resultado de gerar a demo novamente. Para relatar um problema, inclua um trecho LRC fictício, o segundo em que ocorreu e o comportamento esperado.
 
@@ -66,3 +78,7 @@ Use `python lyrics.py demo.lrc --srt ensaio.srt` para gerar legendas numeradas e
 ## Tom do áudio
 
 Ao mudar a velocidade, escolha se quer manter o tom original da gravação ou acompanhar a mudança de velocidade. O controle aparece em navegadores que oferecem esse recurso.
+
+## Editar o site e verificar
+
+A estrutura está em `rehearsal.html`, o estilo em `web/studio.css` e o player em `web/player.js`. O exportador incorpora tudo em um HTML portátil. Após uma alteração, rode `python build_demo.py` e `python -m unittest -v`. O teste de interface usa Playwright e Chromium, em larguras de 375 e 1280 pixels. Para reproduzir, instale `playwright==1.55.0`, execute `python -m playwright install chromium` e depois `python tests/browser.py`.

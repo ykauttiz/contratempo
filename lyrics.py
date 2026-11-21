@@ -1,29 +1,9 @@
 """Play an LRC timeline locally, optionally sharing the current line via Discord RPC."""
 import argparse
-import re
+import math
 import time
 from pathlib import Path
-from itertools import groupby
-
-STAMP = re.compile(r"\[(\d+):([0-5]\d)(?:[.:](\d{1,3}))?\]")
-
-
-def timeline(source):
-    offset = re.search(r"^\[offset:([+-]?\d+)\]\s*$", source, re.MULTILINE | re.I)
-    shift = int(offset[1]) / 1000 if offset else 0
-    entries = []
-    for line in source.splitlines():
-        stamps = list(STAMP.finditer(line))
-        if stamps:
-            lyric = line[stamps[-1].end():].strip()
-            for stamp in stamps:
-                minutes, seconds, fraction = stamp.groups()
-                moment = int(minutes) * 60 + int(seconds) + int((fraction or "").ljust(3, "0")) / 1000
-                entries.append((max(0, moment - shift), lyric))
-    entries.sort(key=lambda entry: entry[0])
-    return [(at, " / ".join(text for _, text in group if text))
-            for at, group in groupby(entries, key=lambda entry: entry[0])]
-
+from lrc import timeline
 
 def play(lines, title, client, start, clock=time.monotonic, sleep=time.sleep, display=print):
     origin = clock() - start
@@ -59,7 +39,10 @@ def main():
     output.add_argument("--html", type=Path, help="Create a local rehearsal page")
     output.add_argument("--vtt", type=Path, help="Export WebVTT subtitles")
     output.add_argument("--srt", type=Path, help="Export numbered SubRip subtitles")
+    parser.add_argument("--last-duration", type=float, help="Seconds for a final subtitle without an end marker (default 3)")
     args = parser.parse_args()
+    if args.last_duration is not None and (not (args.vtt or args.srt) or not math.isfinite(args.last_duration) or args.last_duration < 0.001):
+        parser.error("--last-duration requires --vtt or --srt and at least one millisecond")
     target = args.html or args.vtt or args.srt
     if target and (args.client_id or args.start):
         parser.error("Export and playback options must be used separately")
@@ -67,6 +50,8 @@ def main():
         parser.error("--start must be at least zero")
     client = None
     try:
+        if args.file.stat().st_size > 1024 * 1024:
+            parser.error("LRC exceeds 1 MiB")
         lines = timeline(args.file.read_text(encoding="utf-8-sig"))
         if not lines:
             parser.error("No [mm:ss.xx] timestamps in this file")
@@ -75,7 +60,7 @@ def main():
             if args.html:
                 content = rehearsal(lines, args.file.stem)
             else:
-                content = subtitles(lines, subrip=bool(args.srt))
+                content = subtitles(lines, subrip=bool(args.srt), last_duration=args.last_duration or 3)
             with target.open("x", encoding="utf-8", newline="\n") as stream:
                 stream.write(content)
             return

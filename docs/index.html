@@ -1,86 +1,259 @@
 <!doctype html>
-<html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Contratempo · sala de ensaio</title>
-<style>
-:root{color-scheme:dark;background:#102731;color:#fbf1df;font:17px/1.55 system-ui,sans-serif}
-*{box-sizing:border-box}body{margin:auto;max-width:56rem;padding:clamp(1rem,5vw,4rem)}
-header,footer{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #60818a;padding:1rem 0;gap:1rem;flex-wrap:wrap}
-header b{letter-spacing:.09em}header a,footer a{color:#ffbc86}
-h1{font:normal clamp(2.5rem,8vw,5rem)/1 Georgia,serif;margin:2rem 0 1rem}
-#current{font:normal clamp(1.8rem,5vw,3.7rem)/1.1 Georgia,serif;margin:.45rem 0;overflow-wrap:anywhere}
-#next,small{color:#c2d0d1}.stage{border-left:4px solid #ffae76;padding:.5rem 1.2rem;margin:2rem 0}
-audio{width:100%;margin:.5rem 0 1rem}select,input,button{font:inherit;max-width:100%}
-.tools{display:flex;gap:1rem;align-items:center;flex-wrap:wrap}.tools label{display:grid;gap:.35rem}
-ol{padding-left:0;list-style:none}li button{padding:.65rem .25rem;width:100%;text-align:left;color:inherit;background:transparent;border:0;border-bottom:1px solid #42606a;cursor:pointer}
-li button[aria-current=true]{color:#ffbc86}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #ffbc86}
-time{font: .86rem monospace;color:#afc4c6;margin-right:1rem}
-[hidden]{display:none!important}.tools label{min-width:0;max-width:100%}button,select{min-height:44px}
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Ensaie com letra sincronizada, marque trechos para repetir e edite arquivos LRC direto no navegador.">
+<title>Contratempo · Sala de ensaio</title>
+<style>:root{color-scheme:dark;--ink:#fff2ec;--muted:#cfb9bd;--coral:#ffa58c;--edge:#654953;--panel:#302128;background:#21171d;color:var(--ink);font:16px/1.55 system-ui,sans-serif}
+*{box-sizing:border-box}body{margin:auto;max-width:75rem;padding:0 clamp(1rem,4vw,3.5rem)}a{color:inherit}.skip{position:absolute;top:-5rem;background:#21171d;padding:1rem;z-index:5}.skip:focus{top:0}
+header,footer,.actions,.settings{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}header,footer{justify-content:space-between;padding:1.25rem 0}header a{text-decoration:none}.brand{font-weight:740;letter-spacing:-.045em;font-size:1.35rem;display:flex;gap:.6rem;align-items:center}.brand i{display:block;width:26px;height:21px;background:repeating-linear-gradient(105deg,transparent 0 4px,var(--coral) 4px 7px);transform:skewY(-12deg)}.source{font-size:.9rem}
+.sleeve{position:relative;isolation:isolate;overflow:hidden;background:#f4ae99;color:#301d26;padding:clamp(1.5rem,5vw,4rem);margin:.5rem 0 1.25rem;border-radius:12px;min-height:14rem;display:grid;align-items:center}.jacket{width:66%;z-index:1}.label{font:700 .74rem/1.4 ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;margin:0}.jacket h1{font:normal clamp(2.6rem,6vw,5.9rem)/.99 Georgia,serif;letter-spacing:-.064em;margin:.65rem 0;overflow-wrap:anywhere}.jacket p:last-child{margin:1rem 0 0}
+.disc{position:absolute;width:43%;aspect-ratio:1;right:-9%;top:50%;transform:translateY(-50%);border-radius:50%;display:grid;place-items:center;background:repeating-radial-gradient(circle,transparent 0 3px,#fff2ec26 3.5px 4px),conic-gradient(from 32deg,#35252b,#78555a,#251b21,#77565b,#35252b);box-shadow:-9px 10px 0 #713a3e2a}.disc i{width:32%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,#21171d 0 5%,#ef9b82 6% 49%,#37242d 50% 51%,#ef9b82 52%)}
+.desk{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:1rem}.monitor,.queue,.workspace{padding:clamp(1.1rem,2.8vw,2rem);border:1px solid var(--edge);border-radius:12px;background:var(--panel)}.monitor .label,time{color:var(--coral)}h2{margin:0 0 .75rem;font:normal 1.8rem Georgia,serif}#current{font:normal clamp(2rem,4.5vw,3.5rem)/1.08 Georgia,serif;letter-spacing:-.035em;margin:1rem 0 .65rem;overflow-wrap:anywhere}#next,.workspace p,small,footer,#range{color:var(--muted)}#next{min-height:1.5em;overflow-wrap:anywhere}audio{width:100%;margin:.5rem 0 1rem}.settings{align-items:end;gap:1rem}label{display:grid;gap:.4rem;min-width:0;max-width:100%;font-size:.88rem}button,input,select,textarea{font:inherit;max-width:100%;color:var(--ink)}input,button,select,textarea{background:#24191f;border:1px solid var(--edge);border-radius:6px;padding:.55rem .75rem}button,select,input,summary{min-height:44px}button,summary,select{cursor:pointer}button:hover:not(:disabled),summary:hover{color:var(--coral)}button:disabled{opacity:.55}button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--coral);outline-offset:3px}fieldset{margin:1.4rem 0 0;border:0;border-top:1px solid var(--edge);padding:.65rem 0 0}legend{padding:0 .5rem 0 0;font-weight:600}small{display:block;margin:.45rem 0}.queue ol{padding:0;margin:0;list-style:none;max-height:24rem;overflow:auto}.queue button{display:flex;gap:1rem;text-align:left;align-items:baseline;width:100%;border:0;border-bottom:1px solid var(--edge);border-radius:0;background:transparent;padding:.85rem .5rem;overflow-wrap:anywhere}.queue button[aria-current=true]{background:#51343b;box-shadow:inset 3px 0 var(--coral)}time{font:.82rem ui-monospace,monospace;white-space:nowrap}.workspace{margin-top:1rem}.workspace p{margin:.5rem 0 1rem}details{margin-top:1.25rem;border-top:1px solid var(--edge);padding-top:1rem}summary{font-weight:650}textarea{font:1rem/1.5 ui-monospace,monospace;width:100%;resize:vertical}.actions{margin:.5rem 0}#apply{background:var(--coral);color:#291a20;font-weight:650}footer{border-top:1px solid var(--edge);font-size:.86rem}#status:not(:empty){position:sticky;bottom:.75rem;background:#392830;border:1px solid var(--edge);border-radius:6px;padding:.75rem 1rem}#status:empty{margin:.7rem 0}[hidden]{display:none!important}
+@media(max-width:720px){.desk{grid-template-columns:1fr}.sleeve{min-height:11rem}.jacket{width:71%}.queue ol{max-height:16rem}.workspace .settings{display:grid}.disc{right:-15%}}
+@media(prefers-reduced-motion:no-preference){.playing .disc i{animation:spin 6s linear infinite;background:radial-gradient(circle,#21171d 0 5%,transparent 6%),conic-gradient(#ef9b82 0 80%,#b25c53 80% 86%,#ef9b82 86%)}@keyframes spin{to{transform:rotate(1turn)}}}
+.mode{float:right;font-size:.83rem}.monitor .label{padding-top:.75rem}.monitor #current{clear:both;padding-top:.4rem}.present :is(header,.sleeve,.queue,.workspace,footer,fieldset,.monitor .settings){display:none}.present .desk{display:block}.present .monitor{min-height:95vh;display:flex;flex-direction:column;justify-content:center}.present .mode{align-self:flex-end}.present #current{font-size:clamp(3rem,8vw,8rem)}#cue{max-width:min(100%,32rem)}
+
+.workspace.drag{outline:3px dashed var(--coral)}
 </style>
-<header><b>CONTRATEMPO</b><a href="https://github.com/ykauttiz/contratempo">Código no GitHub ↗</a></header>
-<main><h1 id="title"></h1>
-<div class="stage"><small>Verso atual</small><p id="current"></p><p id="next"></p></div>
-<audio id="audio" controls preload="metadata"></audio>
-<div class="tools"><label>Usar áudio local<input id="upload" type="file" accept="audio/*"></label>
-<label>Velocidade<select id="speed"><option>0.75</option><option selected>1</option><option>1.25</option><option>1.5</option></select></label><label id="pitch-control" hidden><span>Tom do áudio</span><select id="pitch"><option value="preserve">Manter original</option><option value="vary">Variar com a velocidade</option></select></label></div>
-<p id="status" role="status"></p><h2>Versos</h2><ol id="lines"></ol></main>
-<footer><small>O arquivo de áudio escolhido fica no navegador.</small></footer>
-<script id="score" type="application/json">{"lines": [[0, "O farol riscou a rua"], [3.0, "A chuva ficou pra trás"], [6.0, "Na curva da madrugada"], [9.0, "Teu áudio tocou mais uma vez"], [12.0, ""]], "title": "Depois da chuva", "audio": "ensaio.mp3"}</script>
-<script>
-const score = JSON.parse(document.querySelector("#score").textContent);
-const audio = document.querySelector("#audio");
-const statusText = document.querySelector("#status");
-const speed = document.querySelector("#speed");
-let localUrl, selected = -2;
-document.querySelector("#title").textContent = score.title;
-const buttons = score.lines.map(([at, line]) => {
-  const row = document.createElement("li");
-  const button = document.createElement("button");
-  const stamp = document.createElement("time");
-  stamp.textContent = Math.floor(at / 60) + ":" + String(Math.floor(at % 60)).padStart(2,"0");
-  button.append(stamp, line || "Pausa");
-  button.onclick = () => {
-    if (audio.readyState < 1) {statusText.textContent = "Selecione um áudio e aguarde o carregamento.";return;}
-    audio.currentTime = Math.min(at, audio.duration);
-    render();
-  };
-  row.append(button);
-  document.querySelector("#lines").append(row);
-  return button;
-});
-function render() {
-  let low = 0, high = score.lines.length;
-  while (low < high) {
-    const mid = Math.floor((low + high) / 2);
-    if (score.lines[mid][0] <= audio.currentTime) low = mid + 1;
-    else high = mid;
+</head>
+<body>
+<a class="skip" href="#studio">Ir para o ensaio</a>
+<header><a class="brand" href="#studio"><i aria-hidden="true"></i> Contratempo</a><a class="source" href="https://github.com/ykauttiz/contratempo">GitHub ↗</a></header>
+<main id="studio">
+<section class="sleeve" aria-labelledby="title">
+<div class="jacket"><p class="label">Sala de ensaio</p><h1 id="title"></h1><p id="track-info"></p></div><div class="disc" aria-hidden="true"><i></i></div>
+</section>
+<div class="desk">
+<section class="monitor" aria-labelledby="now"><button id="present" class="mode">Apresentar</button><h2 class="label" id="now">Verso atual</h2><p id="current"></p><p id="next"></p>
+<audio id="audio" controls preload="metadata" aria-label="Reprodutor do ensaio"></audio>
+<div class="settings"><label>Velocidade<select id="speed"><option value=".5">0,5×</option><option value=".75">0,75×</option><option selected value="1">1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option></select></label>
+<label id="pitch-control" hidden>Tom do áudio<select id="pitch"><option value="preserve">Manter original</option><option value="vary">Variar com a velocidade</option></select></label></div>
+<fieldset><legend>Repetir um trecho</legend><div class="actions"><button id="mark-a">Marcar A</button><button id="mark-b">Marcar B</button><button id="clear" disabled>Limpar</button></div><small id="range">Marque o início e depois o fim durante o ensaio.</small></fieldset>
+</section>
+<section class="queue"><h2>Versos</h2><ol id="lines" aria-label="Ir para um verso"></ol></section>
+</div>
+<section class="workspace"><h2>Seu ensaio</h2><p>Selecione ou arraste a gravação e a letra LRC para cá. Os arquivos ficam neste navegador.</p>
+<div class="settings"><label>Usar áudio local<input id="upload" type="file" accept="audio/*"></label><label>Importar letra LRC<input id="lrc" type="file" accept=".lrc,text/plain"></label></div>
+<details><summary>Editar letra e sincronização</summary><p>Use uma marca por verso, como [00:03.500]. Uma linha só com a marca indica pausa.</p><div class="settings"><label>Verso para sincronizar<select id="cue"></select></label><button id="tap">Marcar no tempo atual</button></div><label>Letra LRC<textarea id="editor" rows="8" spellcheck="false"></textarea></label>
+<label>Ajuste adicional (ms)<input id="offset" type="number" step="1" value="0"></label><small>Um valor positivo adianta a letra. O ajuste entra no arquivo ao aplicar.</small>
+<div class="actions"><button id="apply">Aplicar edição</button><button id="undo" disabled>Desfazer</button><button id="redo" disabled>Refazer</button></div><div class="settings"><label>Formato<select id="format"><option>LRC</option><option>SRT</option><option>WebVTT</option></select></label><button id="save">Baixar arquivo aplicado</button></div></details></section>
+<p id="status" role="status"></p></main>
+<footer>Contratempo <span>Ensaio com letras sincronizadas</span></footer>
+<script id="score" type="application/json">{"lines": [[0.0, "O farol riscou a rua"], [3.0, "A chuva ficou pra trás"], [6.0, "Na curva da madrugada"], [9.0, "Teu áudio tocou mais uma vez"], [12.0, ""]], "title": "Depois da chuva", "audio": "ensaio.mp3"}</script>
+<script>"use strict";
+const $ = id => document.getElementById(id);
+const score = JSON.parse($("score").textContent);
+const audio = $("audio");
+const past = [], future = [];
+let selected = -2, buttons = [], localUrl, pointA = null, pointB = null, importId = 0;
+function tell(message) { $("status").textContent = message; }
+function stamp(seconds, precise = false) {
+  const ms = Math.round(seconds * 1000);
+  return String(Math.floor(ms / 60000)).padStart(2, "0") + ":" +
+    String(Math.floor(ms / 1000) % 60).padStart(2, "0") +
+    (precise ? "." + String(ms % 1000).padStart(3, "0") : "");
+}
+function serialize() {
+  return score.lines.map(([at, line]) => "[" + stamp(at, true) + "]" + line).join("\n") + "\n";
+}
+function parseLrc(source, extra) {
+  source = source.replace(/^\uFEFF/, "");
+  const offset = Number(source.match(/^\[offset:([+-]?\d+)\][ \t]*\r?$/im)?.[1] || 0) + extra;
+  if (!Number.isSafeInteger(offset)) throw Error("Informe um ajuste inteiro em milissegundos.");
+  const groups = new Map();
+  let count = 0;
+  for (const raw of source.replace(/^\uFEFF/, "").split(/\r\n|\r|\n/)) {
+    const line = raw.trimStart();
+    const prefix = line.match(/^(?:\[\d+:[0-5]\d(?:[.:]\d{1,3})?\])+/);
+    if (!prefix) continue;
+    const lyric = line.slice(prefix[0].length).trim();
+    for (const m of prefix[0].matchAll(/\[(\d+):([0-5]\d)(?:[.:](\d{1,3}))?\]/g)) {
+      const at = Number(m[1]) * 60000 + Number(m[2]) * 1000 + Number((m[3] || "").padEnd(3, "0")) - offset;
+      if (!Number.isSafeInteger(at) || ++count > 10000) throw Error("Use até 10 mil marcações com tempos válidos.");
+      const key = Math.max(0, at);
+      if (!groups.has(key)) groups.set(key, []);
+      if (lyric) groups.get(key).push(lyric);
+    }
   }
-  const index = low - 1;
+  if (!groups.size) throw Error("Nenhum verso com tempo válido. Use [mm:ss.mmm] no começo da linha.");
+  return Array.from(groups).sort(([a], [b]) => a - b).map(([ms, parts]) => [ms / 1000, parts.join(" / ")]);
+}
+function render() {
+  let lo = 0, hi = score.lines.length;
+  while (lo < hi) {
+    const mid = Math.floor((lo + hi) / 2);
+    if (score.lines[mid][0] <= audio.currentTime) lo = mid + 1;
+    else hi = mid;
+  }
+  const index = lo - 1;
   if (index === selected) return;
   buttons[selected]?.removeAttribute("aria-current");
-  buttons[index]?.setAttribute("aria-current","true");
-  document.querySelector("#current").textContent = score.lines[index]?.[1] || "♪";
+  buttons[index]?.setAttribute("aria-current", "true");
+  $("current").textContent = index < 0 ? "Introdução" : score.lines[index][1] || "Pausa";
   const next = score.lines[index + 1]?.[1];
-  document.querySelector("#next").textContent = next ? "A seguir · " + next : "";
+  $("next").textContent = next ? "A seguir · " + next : "";
   selected = index;
 }
-for (const event of ["timeupdate","seeked","loadedmetadata","ended"]) audio.addEventListener(event, render);
-audio.addEventListener("loadedmetadata", () => {audio.playbackRate = Number(speed.value); statusText.textContent = document.querySelector("#upload").files[0]?.name || "";});
-audio.addEventListener("error", () => {statusText.textContent = "O navegador não conseguiu abrir o áudio. Experimente outro arquivo.";});
-const pitch = document.querySelector("#pitch");
-if ("preservesPitch" in audio) {
-  document.querySelector("#pitch-control").hidden = false;
-  pitch.onchange = () => { audio.preservesPitch = pitch.value === "preserve"; };
+function build() {
+  $("title").textContent = score.title;
+  const total = score.lines.filter(([, line]) => line).length;
+  $("track-info").textContent = total + (total === 1 ? " verso sincronizado" : " versos sincronizados");
+  const fragment = document.createDocumentFragment();
+  buttons = score.lines.map(([at, line], index) => {
+    const row = document.createElement("li"), button = document.createElement("button");
+    const time = document.createElement("time");
+    time.textContent = stamp(at, at % 1 !== 0);
+    button.append(time, line || "Pausa");
+    button.onclick = () => {
+      if (!audio.readyState) return tell("Escolha um áudio e aguarde o carregamento.");
+      audio.currentTime = Math.min(audio.duration, at);
+      render();
+    };
+    button.onkeydown = event => {
+      const dest = {ArrowDown:index + 1, ArrowUp:index - 1, Home:0, End:buttons.length - 1}[event.key];
+      if (dest === undefined) return;
+      event.preventDefault();
+      buttons[Math.max(0, Math.min(buttons.length - 1, dest))].focus();
+    };
+    row.append(button); fragment.append(row);
+    return button;
+  });
+  $("lines").replaceChildren(fragment);
+  const options = score.lines.map(([at, line], index) => new Option(stamp(at, true) + " · " + (line || "Pausa"), index));
+  $("cue").replaceChildren(...options);
+  $("editor").value = serialize();
+  $("offset").value = "0";
+  selected = -2;
+  render();
 }
-speed.onchange = () => {audio.playbackRate = Number(speed.value);};
-document.querySelector("#upload").onchange = event => {
-  const file = event.target.files[0];
+function updateLoop() {
+  $("clear").disabled = pointA === null;
+  $("range").textContent = pointA === null ? "Marque o início e depois o fim durante o ensaio." :
+    pointB === null ? "Início em " + stamp(pointA, true) + ". Escolha o fim." :
+    "Repetindo de " + stamp(pointA, true) + " até " + stamp(pointB, true) + ".";
+}
+$("mark-a").onclick = () => {
+  if (!audio.readyState) return tell("Carregue um áudio primeiro.");
+  pointA = audio.currentTime; pointB = null; updateLoop(); tell($("range").textContent);
+};
+$("mark-b").onclick = () => {
+  if (pointA === null || audio.currentTime - pointA < 0.25) return tell("Marque A e avance pelo menos 0,25 s antes de marcar B.");
+  pointB = audio.currentTime; audio.currentTime = pointA; updateLoop(); tell($("range").textContent);
+};
+function clearLoop() { pointA = pointB = null; updateLoop(); }
+$("clear").onclick = () => { clearLoop(); tell("Repetição desligada."); };
+function tick() {
+  if (pointB !== null && !audio.paused && audio.currentTime >= pointB) audio.currentTime = pointA;
+  render();
+}
+let frame = 0;
+function animate() { tick(); if (!audio.paused) frame = requestAnimationFrame(animate); }
+audio.onplay = () => { document.body.classList.add("playing"); cancelAnimationFrame(frame); animate(); };
+audio.onpause = () => { document.body.classList.remove("playing"); cancelAnimationFrame(frame); };
+audio.onended = () => {
+  if (pointB !== null) { audio.currentTime = pointA; audio.play().catch(() => tell("Pressione play para continuar.")); }
+};
+audio.ontimeupdate = tick;
+audio.onseeked = render;
+audio.onloadedmetadata = () => { audio.playbackRate = Number($("speed").value); render(); };
+audio.onerror = () => tell("Não foi possível abrir o áudio. Tente outro arquivo.");
+$("pitch-control").hidden = !("preservesPitch" in audio);
+$("pitch").onchange = () => { audio.preservesPitch = $("pitch").value === "preserve"; };
+$("speed").onchange = () => { audio.playbackRate = Number($("speed").value); };
+function loadAudio(file) {
   if (!file) return;
+  clearLoop();
   if (localUrl) URL.revokeObjectURL(localUrl);
-  localUrl = URL.createObjectURL(file);
-  audio.src = localUrl;
-  statusText.textContent = file.name;
+  localUrl = URL.createObjectURL(file); audio.src = localUrl;
+  tell("Gravação selecionada · " + file.name);
+};
+$("upload").onchange = event => loadAudio(event.target.files[0]);
+async function loadLyrics(file) {
+  const id = ++importId;
+  if (!file) return;
+  try {
+    if (file.size > 1024 * 1024) throw Error("Use uma letra de até 1 MB.");
+    const source = new TextDecoder("utf-8", {fatal:true}).decode(await file.arrayBuffer());
+    if (id !== importId) return;
+    const lines = parseLrc(source, 0);
+    past.length = future.length = 0; historyButtons();
+    score.lines = lines; score.title = source.match(/^\[ti:([^\]\r\n]+)\]/im)?.[1] || file.name.replace(/\.lrc$/i, "");
+    build(); clearLoop(); tell("Letra carregada · " + file.name);
+  } catch (err) { if (id === importId) tell(err instanceof TypeError ? "Salve a letra em UTF-8 e tente novamente." : err.message); }
+};
+$("lrc").onchange = event => loadLyrics(event.target.files[0]);
+const desk = document.querySelector(".workspace");
+desk.ondragover = event => { event.preventDefault(); desk.classList.add("drag"); };
+desk.ondragleave = () => desk.classList.remove("drag");
+desk.ondrop = event => {
+  event.preventDefault(); desk.classList.remove("drag");
+  for (const file of event.dataTransfer.files) {
+    if (/\.lrc$/i.test(file.name)) loadLyrics(file);
+    else if (file.type.startsWith("audio/")) loadAudio(file);
+    else tell("Arraste um arquivo LRC ou uma gravação de áudio.");
+  }
+};
+$("apply").onclick = () => {
+  try {
+    if (!$("offset").validity.valid) throw Error("Use um número inteiro para o ajuste.");
+    const lines = parseLrc($("editor").value, Number($("offset").value));
+    remember(); score.lines = lines;
+    ++importId; build(); tell("Letra aplicada. Baixe o LRC para guardar a edição.");
+  } catch (err) { tell(err.message); }
+};
+function historyButtons() { $("undo").disabled = !past.length; $("redo").disabled = !future.length; }
+function remember() {
+  past.push(score.lines); if (past.length > 20) past.shift();
+  future.length = 0; historyButtons();
+}
+function restore(from, to) {
+  if (!from.length) return;
+  to.push(score.lines); score.lines = from.pop(); build(); historyButtons();
+}
+$("undo").onclick = () => restore(past, future);
+$("redo").onclick = () => restore(future, past);
+$("tap").onclick = () => {
+  if (!audio.readyState) return tell("Carregue um áudio primeiro.");
+  const index = Number($("cue").value), at = Math.round(audio.currentTime * 1000) / 1000;
+  if ((index > 0 && at <= score.lines[index - 1][0]) ||
+      (index + 1 < score.lines.length && at >= score.lines[index + 1][0])) return tell("Marque o tempo entre o verso anterior e o seguinte.");
+  remember();
+  score.lines = score.lines.map((entry, i) => i === index ? [at, entry[1]] : entry);
+  build(); $("cue").selectedIndex = Math.min(index + 1, score.lines.length - 1); tell("Tempo do verso atualizado.");
+};
+function togglePresentation() {
+  const enabled = document.body.classList.toggle("present");
+  $("present").textContent = enabled ? "Voltar ao ensaio" : "Apresentar";
+  $("present").setAttribute("aria-pressed", String(enabled));
+  $("present").focus();
+}
+$("present").onclick = togglePresentation;
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape" && document.body.classList.contains("present")) togglePresentation();
+});
+function captions(srt) {
+  const clock = seconds => {
+    const ms = Math.round(seconds * 1000), h = Math.floor(ms / 3600000);
+    return String(h).padStart(2, "0") + ":" + stamp((ms % 3600000) / 1000, true).replace(".", srt ? "," : ".");
+  };
+  const blocks = [];
+  score.lines.forEach(([at, line], i) => {
+    if (!line) return;
+    const end = score.lines[i + 1]?.[0] ?? at + 3;
+    const text = srt ? line : line.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+    blocks.push((srt ? (blocks.length + 1) + "\n" : "") + clock(at) + " --> " + clock(end) + "\n" + text);
+  });
+  return (srt ? "" : "WEBVTT\n\n") + blocks.join("\n\n") + "\n";
+}
+$("save").onclick = () => {
+  const format = $("format").value;
+  const content = format === "LRC" ? serialize() : captions(format === "SRT");
+  const url = URL.createObjectURL(new Blob([content], {type:"text/plain;charset=utf-8"}));
+  const a = document.createElement("a"); a.href = url; a.download = score.title + "." + ({LRC:"lrc", SRT:"srt", WebVTT:"vtt"})[format]; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 };
 if (score.audio) audio.src = score.audio;
-else statusText.textContent = "Escolha a gravação correspondente a esta letra.";
-render();
-</script></html>
+else tell("Escolha a gravação correspondente a esta letra.");
+build();
+</script></body></html>
