@@ -109,6 +109,12 @@ Guarde ensaios com nomes diferentes na biblioteca local. Cada entrada recupera l
 
 Treino progressivo no loop A/B: escolha duas ou quatro voltas para avançar ao próximo nível de velocidade. O contador acompanha o trecho durante a reprodução.
 
+## Privacidade, segurança e contribuição
+
+A página abre o áudio e a letra escolhidos no próprio navegador e não os envia a nenhum servidor. A sessão e a biblioteca guardadas no navegador contêm título, letra, posição, velocidade e pontos do laço, nunca o áudio. A presença no Discord é opcional e só roda quando você executa `lyrics.py` com `--client-id`.
+
+Para relatar uma falha, veja [SECURITY.md](SECURITY.md). Para propor mudanças, veja [CONTRIBUTING.md](CONTRIBUTING.md). Use somente dados fictícios ou anonimizados em issues e pull requests.
+
 ## Publicar uma versão
 
 Atualize `RELEASE.md` com as mudanças verificadas. Para marcar uma entrega, use na branch principal um commit com o título `release(vAAAA.MM.DD) Título da atualização`. Para uma segunda edição no mesmo dia, acrescente um número à versão, como `vAAAA.MM.DD.1`. O GitHub Actions publica a release após a aprovação dos testes. Commits comuns continuam atualizando o site.
