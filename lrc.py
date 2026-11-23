@@ -3,6 +3,13 @@ import re
 from itertools import groupby
 
 STAMP = re.compile(r"\[(\d+):([0-5]\d)(?:[.:](\d{1,3}))?\]")
+WORD = re.compile(r"<\d+:[0-5]\d(?:[.:]\d{1,3})?>")
+
+
+def plain(text):
+    """Drop enhanced-LRC word stamps such as <00:12.50>; only the line time is used."""
+    text = text.strip()
+    return " ".join(WORD.sub(" ", text).split()) if WORD.search(text) else text
 
 
 def timeline(source):
@@ -15,7 +22,7 @@ def timeline(source):
         prefix = re.match(r"^(?:\[\d+:[0-5]\d(?:[.:]\d{1,3})?\])+", line)
         stamps = list(STAMP.finditer(prefix[0])) if prefix else []
         if stamps:
-            lyric = line[stamps[-1].end():].strip()
+            lyric = plain(line[stamps[-1].end():])
             for stamp in stamps:
                 minutes, seconds, fraction = stamp.groups()
                 moment = int(minutes) * 60000 + int(seconds) * 1000 + int((fraction or "").ljust(3, "0"))
