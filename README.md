@@ -12,6 +12,10 @@ Abra uma gravação, volte ao verso que escapou e ensaie de novo mais devagar. O
 
 ![Sala de ensaio com a faixa Depois da chuva e os controles de reprodução.](assets/demonstracao.webp)
 
+## Portfólio de cinco ferramentas
+
+A [vitrine de projetos](https://ykauttiz.github.io/contratempo/portfolio/) reúne Contratempo, Fecha a Conta, Porta Fechada, Últimos 50 Metros e Rastro Curto. O quinto cartão usa uma representação gráfica do exemplo fictício (não uma captura real), com valores verificados da demonstração; cada projeto tem fluxo rápido de teste e link para o código.
+
 ## Aparência e navegação
 
 No cabeçalho, escolha **Sistema**, **Claro** ou **Escuro**. Sistema acompanha o aparelho. O navegador guarda a escolha localmente para a próxima visita. Use Tab para chegar ao atalho de conteúdo e aos controles. As transições respeitam a preferência de movimento reduzido.

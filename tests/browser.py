@@ -198,12 +198,16 @@ with sync_playwright() as engine, TemporaryDirectory() as folder:
         assert page.evaluate("location.hash === '#projetos'")
         assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
         projects = page.locator(".project")
-        expect(projects).to_have_count(4)
+        expect(projects).to_have_count(5)
+        expect(page.get_by_role('link',name='Abrir Rastro Curto, ferramenta de comparação de capturas de rede')).to_have_attribute('href','https://ykauttiz.github.io/rastro-curto/')
         for project in projects.all():
             project.locator("summary").press("Enter")
             expect(project.locator("details p")).to_be_visible()
             preview = project.locator("img")
-            assert page.request.get(preview.evaluate("image => image.src")).ok
+            if preview.count():
+                assert page.request.get(preview.evaluate("image => image.src")).ok
+            else:
+                expect(project.locator(".network-art")).to_be_visible()
         if os.environ.get("CAPTURAR_DEMO") == "1":
             page.screenshot(path=captures / f"portfolio-{width}.png", full_page=True, animations="disabled")
         assert not errors, errors

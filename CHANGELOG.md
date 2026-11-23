@@ -1,5 +1,13 @@
 # Changelog
 
+## 23 de novembro de 2026 · Portfólio com cinco projetos
+
+- Adicionado Rastro Curto à vitrine pública com preview estilizado e explicitamente fictício, acesso à demonstração e ao repositório.
+- Cartões responsivos e animações reduzidas quando o sistema solicitar movimento mínimo.
+- Teste de navegador exige os cinco projetos e valida seus links e imagens/preview em telas estreitas.
+
+
+
 ## 22 de novembro de 2026 · Link de salto legível no tema claro
 
 - O link "Ir para o ensaio", primeiro destino do Tab, tinha texto escuro sobre fundo escuro no tema claro (1,1:1). Agora usa as cores do tema. O teste de navegador mede o contraste do texto visível nos dois temas e falha abaixo de 4,5:1 (3:1 para texto grande).
