@@ -117,3 +117,13 @@ footer.masthead { border-top: 1px solid var(--line); border-bottom: 0 }
   .network-preview .network-rule>span{transition:width .3s ease}
   .network-preview:hover .network-rule>span{width:45%}
 }
+
+
+/* A quinta ferramenta fecha a grelha em tela larga, sem coluna vazia. */
+@media(min-width:780px){
+  .project.network{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr)}
+  .network .network-preview{min-height:300px;aspect-ratio:auto}
+  .network .network-art{width:100%;max-width:670px;margin-inline:auto}
+  .network .project-copy{border-top:0;border-left:3px solid var(--accent);display:flex;flex-direction:column;justify-content:center}
+  .network .project-copy .links{margin-top:.85rem}
+}
