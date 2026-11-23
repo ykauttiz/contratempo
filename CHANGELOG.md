@@ -1,5 +1,10 @@
 # Changelog
 
+## 23 de novembro de 2026 · Composição desktop do portfólio
+
+- O quinto cartão agora ocupa a linha inteira em telas largas, com preview e descrição lado a lado; evita uma coluna vazia.
+- Testes de navegador verificam a composição sem alterar a apresentação em celulares.
+
 ## 23 de novembro de 2026 · Portfólio com cinco projetos
 
 - Adicionado Rastro Curto à vitrine pública com preview estilizado e explicitamente fictício, acesso à demonstração e ao repositório.

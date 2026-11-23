@@ -199,6 +199,10 @@ with sync_playwright() as engine, TemporaryDirectory() as folder:
         assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
         projects = page.locator(".project")
         expect(projects).to_have_count(5)
+        if width == 1280:
+            assert page.locator(".network").bounding_box()["width"] > projects.first.bounding_box()["width"] * 1.8
+            assert abs(page.locator(".network-preview").bounding_box()["y"] - page.locator(".network .project-copy").bounding_box()["y"]) < 2
+
         expect(page.get_by_role('link',name='Abrir Rastro Curto, ferramenta de comparação de capturas de rede')).to_have_attribute('href','https://ykauttiz.github.io/rastro-curto/')
         for project in projects.all():
             project.locator("summary").press("Enter")
